@@ -48,6 +48,8 @@ public class CrimeFragment extends Fragment {
     private Button mSuspectButton;
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
+    private Button mGalleryButton;
+    private CheckBox mFaceDetectionBox;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -169,11 +171,32 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 startActivityForResult(captureImage, REQUEST_PHOTO);
+                //TODO: Add captured photo to database
+                //Bitmap bitmap = PictureUtils.getScaledBitmap(
+                //  mPhotoFile.getPath(), getActivity())
             }
         });
 
         mPhotoView = (ImageView) v.findViewById(R.id.crime_photo);
         updatePhotoView();
+
+        mGalleryButton = (Button) v.findViewById(R.id.crime_gallery);
+        mGalleryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), CrimeImageGalleryActivity.class);
+                intent.putExtra("CRIME_ID", mCrime.getId());
+                startActivity(intent);
+            }
+        });
+
+        mFaceDetectionBox = (CheckBox) v.findViewById(R.id.face_detection);
+        mFaceDetectionBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: Activate face detection
+            }
+        });
 
         return v;
     }
