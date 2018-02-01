@@ -10,6 +10,8 @@ import com.bignerdranch.android.criminalintent.database.CrimeBaseHelper;
 import com.bignerdranch.android.criminalintent.database.CrimeCursorWrapper;
 
 import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeTable;
+import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeImageTable;
+import com.bignerdranch.android.criminalintent.database.CrimeImageCursorWrapper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,6 +44,14 @@ public class CrimeLab {
         mDatabase.insert(CrimeTable.NAME, null, values);
     }
 
+    public void addCrimeImage(CrimeImage image) {
+        ContentValues values = new ContentValues();
+        values.put(CrimeImageTable.Cols.UUID, image.getUuid());
+        values.put(CrimeImageTable.Cols.IDENTIFIER, image.getIdentifier());
+
+        mDatabase.insert(CrimeImageTable.NAME, null, values);
+    }
+
     public List<Crime> getCrimes() {
         List<Crime> crimes = new ArrayList<>();
 
@@ -69,21 +79,75 @@ public class CrimeLab {
             }
 
             cursor.moveToFirst();
+            Crime crime = cursor.getCrime();
             return cursor.getCrime();
         } finally {
             cursor.close();
         }
     }
 
-    public File getPhotoFile(Crime crime) {
-        File externalFilesDir = mContext
-                .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+    /**
+     * Returns a list of all images associated with a crime.
+     * @param crime The crime to get the images for.
+     * @return A list of crime images.
+     */
+    public List<CrimeImage> getCrimeImages(Crime crime) {
+        List<CrimeImage> crimeImages = new ArrayList<>();
+        CrimeImageCursorWrapper cursor = queryCrimeImages(
+                CrimeImageTable.Cols.UUID + " = ?",
+                new String[] { crime.getId().toString() }
+        );
 
+        try {
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                crimeImages.add(cursor.getCrimeImage());
+                cursor.moveToNext();
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return crimeImages;
+    }
+
+    public File getCrimePhoto(Crime crime) {
+        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         if (externalFilesDir == null) {
             return null;
         }
 
+        CrimeImage crimeImage = new CrimeImage(crime.getId().toString(), crime.getPhotoFilename());
+        addCrimeImage(crimeImage);
+        return new File(externalFilesDir, crimeImage.getIdentifier());
+    }
+
+    public File getCrimeThumbnail(Crime crime) {
+        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (externalFilesDir == null) {
+            return null;
+        }
+
+        if (crime.getThumbnail() == null) {
+            crime.setThumbnail(crime.getPhotoFilename());
+            addCrimeImage(new CrimeImage(crime.getId().toString(), crime.getThumbnail()));
+        }
+
         return new File(externalFilesDir, crime.getThumbnail());
+    }
+
+    /**
+     * Creates a new file object to store the {@link CrimeImage} on the file system.
+     * @param image The {@link CrimeImage} to store.
+     * @return The {@link File} object to store.
+     */
+    public File getCrimePhotoFile(CrimeImage image) {
+        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (externalFilesDir == null) {
+            return null;
+        }
+
+        return new File(externalFilesDir, image.getIdentifier());
     }
 
     public void updateCrime(Crime crime) {
@@ -119,5 +183,19 @@ public class CrimeLab {
         );
 
         return new CrimeCursorWrapper(cursor);
+    }
+
+    private CrimeImageCursorWrapper queryCrimeImages(String whereClause, String[] whereArgs) {
+        Cursor cursor = mDatabase.query(
+                CrimeImageTable.NAME,
+                null,
+                whereClause,
+                whereArgs,
+                null,
+                null,
+                null
+        );
+
+        return new CrimeImageCursorWrapper(cursor);
     }
 }

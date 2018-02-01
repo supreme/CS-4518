@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeTable;
-import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeGalleryTable;
+import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeImageTable;
 
 public class CrimeBaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "CrimeBaseHelper";
@@ -31,10 +31,10 @@ public class CrimeBaseHelper extends SQLiteOpenHelper {
                 ")"
         );
 
-        db.execSQL("create table " + CrimeGalleryTable.NAME + "(" +
-                CrimeGalleryTable.Cols.UUID + ", " +
-                CrimeGalleryTable.Cols.IDENTIFIER + ", " +
-                " FOREIGN KEY (" + CrimeGalleryTable.Cols.UUID + ") REFERENCES "
+        db.execSQL("create table " + CrimeImageTable.NAME + "(" +
+                CrimeImageTable.Cols.UUID + ", " +
+                CrimeImageTable.Cols.IDENTIFIER + ", " +
+                " FOREIGN KEY (" + CrimeImageTable.Cols.UUID + ") REFERENCES "
                     + CrimeTable.NAME + " (" + CrimeTable.Cols.UUID + ")" +
                 ")"
         );

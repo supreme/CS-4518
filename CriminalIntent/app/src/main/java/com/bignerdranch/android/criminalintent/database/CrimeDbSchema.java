@@ -14,7 +14,7 @@ public class CrimeDbSchema {
         }
     }
 
-    public static final class CrimeGalleryTable {
+    public static final class CrimeImageTable {
       public static final String NAME = "gallery";
 
       public static final class Cols {

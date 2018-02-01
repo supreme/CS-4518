@@ -67,9 +67,10 @@ public class Crime {
     }
 
     public String getThumbnail() {
-        if (thumbnail == null) {
-            thumbnail = getPhotoFilename();
-        }
+//        if (thumbnail == null) {
+//            thumbnail = getPhotoFilename();
+//            Log.d("CAMERA", "Setting thumbnail: " + thumbnail);
+//        }
         return thumbnail;
     }
 
