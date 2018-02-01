@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -165,12 +166,16 @@ public class CrimeFragment extends Fragment {
         if (canTakePhoto) {
             Uri uri = Uri.fromFile(mPhotoFile);
             captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+
+            // Store initial thumbnail in gallery table
+            // TODO
         }
 
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivityForResult(captureImage, REQUEST_PHOTO);
+                Log.d("CAMERA", "Picture button pressed");
                 //TODO: Add captured photo to database
                 //Bitmap bitmap = PictureUtils.getScaledBitmap(
                 //  mPhotoFile.getPath(), getActivity())

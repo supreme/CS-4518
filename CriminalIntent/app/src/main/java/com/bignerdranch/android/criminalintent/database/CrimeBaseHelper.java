@@ -3,8 +3,10 @@ package com.bignerdranch.android.criminalintent.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeTable;
+import com.bignerdranch.android.criminalintent.database.CrimeDbSchema.CrimeGalleryTable;
 
 public class CrimeBaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "CrimeBaseHelper";
@@ -24,9 +26,20 @@ public class CrimeBaseHelper extends SQLiteOpenHelper {
                 CrimeTable.Cols.TITLE + ", " +
                 CrimeTable.Cols.DATE + ", " +
                 CrimeTable.Cols.SUSPECT + ", " +
-                CrimeTable.Cols.SOLVED +
+                CrimeTable.Cols.SOLVED + ", " +
+                CrimeTable.Cols.THUMBNAIL +
                 ")"
         );
+
+        db.execSQL("create table " + CrimeGalleryTable.NAME + "(" +
+                CrimeGalleryTable.Cols.UUID + ", " +
+                CrimeGalleryTable.Cols.IDENTIFIER + ", " +
+                " FOREIGN KEY (" + CrimeGalleryTable.Cols.UUID + ") REFERENCES "
+                    + CrimeTable.NAME + " (" + CrimeTable.Cols.UUID + ")" +
+                ")"
+        );
+
+        Log.d("Database", "onCreate called");
     }
 
     @Override
