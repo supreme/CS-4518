@@ -22,8 +22,8 @@ public class CrimeImageGalleryActivity extends SingleFragmentActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
-        Intent oldIntent = getIntent();
-        Intent intent = new Intent(CrimeImageGalleryActivity.this, CrimePagerActivity.class);
+        Crime crime = new Crime();
+        Intent intent = CrimePagerActivity.newIntent(CrimeImageGalleryActivity.this, ((UUID) getIntent().getSerializableExtra("CRIME_ID")));
         startActivity(intent);
 
         return true;
