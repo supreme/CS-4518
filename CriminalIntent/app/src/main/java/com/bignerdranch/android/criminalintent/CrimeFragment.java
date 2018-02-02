@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -216,12 +217,15 @@ public class CrimeFragment extends Fragment {
                     if(detector.isOperational())
                         Log.d("FACE_DETECT", "Detector is operational");
                     Bitmap bitmapPhoto = ((BitmapDrawable)mPhotoView.getDrawable()).getBitmap();
-                    Canvas canvas = new Canvas(bitmapPhoto.copy(Bitmap.Config.ARGB_8888, true));
+                    Bitmap tempBitmap = bitmapPhoto.copy(Bitmap.Config.ARGB_8888, true);
+                    Canvas canvas = new Canvas(tempBitmap);
                     canvas.drawBitmap(bitmapPhoto,0,0,null);
                     Log.d("FACE_DETECT", "Initialized bitmap and canvas");
 
                     Paint p = new Paint();
                     p.setColor(Color.GREEN);
+                    p.setStrokeWidth(5);
+                    p.setStyle(Paint.Style.STROKE);
                     Log.d("FACE_DETECT", "Initialized paint");
 
                     Frame frame = new Frame.Builder().setBitmap(bitmapPhoto).build();
@@ -235,9 +239,12 @@ public class CrimeFragment extends Fragment {
                         float faceWidth = face.getWidth();
                         float faceHeight = face.getHeight();
                         PointF facePos = face.getPosition();
+                        RectF rect = new RectF(facePos.x, facePos.y, facePos.x+faceWidth, facePos.y+faceHeight);
 
-                        canvas.drawRect(facePos.x, facePos.y, facePos.x+faceWidth, facePos.y+faceHeight, p);
-                        mPhotoView.draw(canvas);
+                        canvas.drawRoundRect(rect, 2, 2, p);
+                        mPhotoView.setImageDrawable(new BitmapDrawable(getResources(),tempBitmap));
+                        //mPhotoView.draw(canvas);
+                        Log.d("FACE_DETECT", "Updated image");
                     }
                 }
 
