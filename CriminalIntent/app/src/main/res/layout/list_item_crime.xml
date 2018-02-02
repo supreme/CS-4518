@@ -2,31 +2,47 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
-    <CheckBox
-        android:id="@+id/list_item_crime_solved_check_box"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:padding="4dp"/>
-
-    <TextView
-        android:id="@+id/list_item_crime_title_text_view"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/list_item_crime_solved_check_box"
-        android:textStyle="bold"
-        tools:text="Crime Title"
-        android:padding="4dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/list_item_crime_date_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/list_item_crime_solved_check_box"
-        android:layout_below="@id/list_item_crime_title_text_view"
-        tools:text="Crime Date"
-        android:padding="4dp"/>
-    
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/list_item_crime_title_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginStart="15dp"
+                android:layout_toLeftOf="@id/list_item_crime_solved_check_box"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                tools:text="Crime Title" />
+
+            <CheckBox
+                android:id="@+id/list_item_crime_solved_check_box"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/list_item_crime_date_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/list_item_crime_title_text_view"
+            android:layout_toLeftOf="@id/list_item_crime_solved_check_box"
+            android:layout_marginLeft="15dp"
+            tools:text="Crime Date" />
+
+    </LinearLayout>
+
 </RelativeLayout>
