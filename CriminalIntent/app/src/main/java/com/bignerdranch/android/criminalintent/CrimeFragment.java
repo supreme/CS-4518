@@ -6,6 +6,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -15,6 +20,8 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +36,11 @@ import android.widget.ImageView;
 import java.io.File;
 import java.util.Date;
 import java.util.UUID;
+
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
 
 public class CrimeFragment extends Fragment {
 
@@ -50,6 +62,7 @@ public class CrimeFragment extends Fragment {
     private ImageView mPhotoView;
     private Button mGalleryButton;
     private CheckBox mFaceDetectionBox;
+    private FaceDetector detector;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -194,9 +207,43 @@ public class CrimeFragment extends Fragment {
         mFaceDetectionBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: Activate face detection
-            }
-        });
+                //Log.d("FACE_DETECT", "Received Click");
+                if(!mFaceDetectionBox.isChecked() && detector != null)
+                    detector.release();
+                else {
+                    detector = new FaceDetector.Builder(getContext()).setTrackingEnabled(false).setLandmarkType(FaceDetector.ALL_LANDMARKS).build();
+                    Log.d("FACE_DETECT", "Initialized detector");
+                    if(detector.isOperational())
+                        Log.d("FACE_DETECT", "Detector is operational");
+                    Bitmap bitmapPhoto = ((BitmapDrawable)mPhotoView.getDrawable()).getBitmap();
+                    Canvas canvas = new Canvas(bitmapPhoto.copy(Bitmap.Config.ARGB_8888, true));
+                    canvas.drawBitmap(bitmapPhoto,0,0,null);
+                    Log.d("FACE_DETECT", "Initialized bitmap and canvas");
+
+                    Paint p = new Paint();
+                    p.setColor(Color.GREEN);
+                    Log.d("FACE_DETECT", "Initialized paint");
+
+                    Frame frame = new Frame.Builder().setBitmap(bitmapPhoto).build();
+                    SparseArray<Face> faces = detector.detect(frame);
+                    Log.d("FACE_DETECT", "Initialized frame and face array");
+
+                    for(int i = 0; i < faces.size(); i++) {
+                        Log.d("FACE_DETECT", "Entered draw");
+                        Face face = faces.valueAt(i);
+
+                        float faceWidth = face.getWidth();
+                        float faceHeight = face.getHeight();
+                        PointF facePos = face.getPosition();
+
+                        canvas.drawRect(facePos.x, facePos.y, facePos.x+faceWidth, facePos.y+faceHeight, p);
+                        mPhotoView.draw(canvas);
+                    }
+                }
+
+                Log.d("FACE_DETECT", "Reached End");
+
+        }});
 
         return v;
     }
