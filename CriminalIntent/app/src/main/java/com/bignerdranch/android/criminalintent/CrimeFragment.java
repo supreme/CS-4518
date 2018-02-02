@@ -44,7 +44,8 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_PHOTO= 2;
 
     private Crime mCrime;
-    private File mPhotoFile;
+    private File thumbnailFile;
+    private File crimeImageFile;
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckbox;
@@ -69,13 +70,6 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
-        Log.d("CAMERA", "Loaded crime (" +  mCrime.getTitle() + ") with thumbnail: " + mCrime.getThumbnail());
-        List<CrimeImage> crimeImages = CrimeLab.get(getActivity()).getCrimeImages(mCrime);
-        Log.d("CAMERA", "Crime contains: " + crimeImages.size() + " images.");
-        for (CrimeImage image : crimeImages) {
-            Log.d("Camera", "Image: " + image.getIdentifier());
-        }
-//        mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime);
     }
 
     @Override
@@ -159,7 +153,7 @@ public class CrimeFragment extends Fragment {
             mSuspectButton.setText(mCrime.getSuspect());
         }
 
-        PackageManager packageManager = getActivity().getPackageManager();
+        final PackageManager packageManager = getActivity().getPackageManager();
         if (packageManager.resolveActivity(pickContact,
                 PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mSuspectButton.setEnabled(false);
@@ -174,29 +168,22 @@ public class CrimeFragment extends Fragment {
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(captureImage, REQUEST_PHOTO);
-                Log.d("CAMERA", "Picture button pressed");
+                if (canTakePhoto) {
+                    if (mCrime.getThumbnail() == null) {
+                        thumbnailFile = CrimeLab.get(getActivity()).getCrimeThumbnail(mCrime);
+                        captureImage.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(thumbnailFile));
+                    } else {
+                        crimeImageFile = CrimeLab.get(getActivity()).getCrimePhoto(mCrime);
+                        captureImage.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(crimeImageFile));
+                    }
+                }
 
-                if (!canTakePhoto) {
-                    Log.d("CAMERA", "Capture image intent is null");
-                    return;
-                }
-                File crimePhoto;
-                if (canTakePhoto && mCrime.getThumbnail() == null) {
-                    crimePhoto = CrimeLab.get(getActivity()).getCrimeThumbnail(mCrime);
-                } else {
-                    crimePhoto = CrimeLab.get(getActivity()).getCrimePhoto(mCrime);
-                }
-                Uri uri = Uri.fromFile(crimePhoto);
-                Log.d("CAMERA", "Saving crime photo: " + uri.getPath());
-                captureImage.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(crimePhoto));
+                startActivityForResult(captureImage, REQUEST_PHOTO);
             }
         });
 
         mPhotoView = (ImageView) v.findViewById(R.id.crime_photo);
-        if (mCrime.getThumbnail() != null) {
-            updatePhotoView();
-        }
+        updatePhotoView();
 
         mGalleryButton = (Button) v.findViewById(R.id.crime_gallery);
         mGalleryButton.setOnClickListener(new View.OnClickListener() {
@@ -289,14 +276,11 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updatePhotoView() {
-        File thumbnail = CrimeLab.get(getActivity()).getCrimeThumbnail(mCrime);
-        Log.d("CAMERA", "Thumbnail path: " + thumbnail.getPath());
-        if (thumbnail == null || !thumbnail.exists()) {
+        File thumbnailFile = CrimeLab.get(getActivity()).getCrimeThumbnail(mCrime);
+        if (thumbnailFile == null || !thumbnailFile.exists()) {
             mPhotoView.setImageDrawable(null);
-            Log.d("CAMERA", "Thumbnail doesn't exist, setting preview to null");
         } else {
-            Log.d("CAMERA", "Setting crime (" + mCrime.getTitle() + ") thumbnail to: " + thumbnail.getPath());
-            Bitmap bitmap = PictureUtils.getScaledBitmap(thumbnail.getPath(), getActivity());
+            Bitmap bitmap = PictureUtils.getScaledBitmap(thumbnailFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
         }
     }

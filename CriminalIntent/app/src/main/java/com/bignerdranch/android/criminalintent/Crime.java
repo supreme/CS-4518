@@ -61,7 +61,7 @@ public class Crime {
     }
 
     public String getPhotoFilename() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd_HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
         Date date = new Date();
         return "IMG_" + dateFormat.format(date) + ".jpg";
     }

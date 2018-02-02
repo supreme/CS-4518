@@ -136,20 +136,6 @@ public class CrimeLab {
         return new File(externalFilesDir, crime.getThumbnail());
     }
 
-    /**
-     * Creates a new file object to store the {@link CrimeImage} on the file system.
-     * @param image The {@link CrimeImage} to store.
-     * @return The {@link File} object to store.
-     */
-    public File getCrimePhotoFile(CrimeImage image) {
-        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        if (externalFilesDir == null) {
-            return null;
-        }
-
-        return new File(externalFilesDir, image.getIdentifier());
-    }
-
     public void updateCrime(Crime crime) {
         String uuidString = crime.getId().toString();
         ContentValues values = getContentValues(crime);
