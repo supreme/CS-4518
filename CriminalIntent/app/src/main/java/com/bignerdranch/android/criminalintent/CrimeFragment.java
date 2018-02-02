@@ -197,7 +197,9 @@ public class CrimeFragment extends Fragment {
         });
 
         mPhotoView = (ImageView) v.findViewById(R.id.crime_photo);
-        updatePhotoView();
+        if (mCrime.getThumbnail() != null) {
+            updatePhotoView();
+        }
 
         mGalleryButton = (Button) v.findViewById(R.id.crime_gallery);
         mGalleryButton.setOnClickListener(new View.OnClickListener() {
