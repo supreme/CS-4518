@@ -213,32 +213,24 @@ public class CrimeFragment extends Fragment {
         mFaceDetectionBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Log.d("FACE_DETECT", "Received Click");
                 if(!mFaceDetectionBox.isChecked() && detector != null)
                     detector.release();
                 else {
                     detector = new FaceDetector.Builder(getContext()).setTrackingEnabled(false).setLandmarkType(FaceDetector.ALL_LANDMARKS).build();
-                    Log.d("FACE_DETECT", "Initialized detector");
-                    if(detector.isOperational())
-                        Log.d("FACE_DETECT", "Detector is operational");
                     Bitmap bitmapPhoto = ((BitmapDrawable)mPhotoView.getDrawable()).getBitmap();
                     Bitmap tempBitmap = bitmapPhoto.copy(Bitmap.Config.ARGB_8888, true);
                     Canvas canvas = new Canvas(tempBitmap);
                     canvas.drawBitmap(bitmapPhoto,0,0,null);
-                    Log.d("FACE_DETECT", "Initialized bitmap and canvas");
 
                     Paint p = new Paint();
                     p.setColor(Color.GREEN);
                     p.setStrokeWidth(5);
                     p.setStyle(Paint.Style.STROKE);
-                    Log.d("FACE_DETECT", "Initialized paint");
 
                     Frame frame = new Frame.Builder().setBitmap(bitmapPhoto).build();
                     SparseArray<Face> faces = detector.detect(frame);
-                    Log.d("FACE_DETECT", "Initialized frame and face array");
 
                     for(int i = 0; i < faces.size(); i++) {
-                        Log.d("FACE_DETECT", "Entered draw");
                         Face face = faces.valueAt(i);
 
                         float faceWidth = face.getWidth();
@@ -248,8 +240,6 @@ public class CrimeFragment extends Fragment {
 
                         canvas.drawRoundRect(rect, 2, 2, p);
                         mPhotoView.setImageDrawable(new BitmapDrawable(getResources(),tempBitmap));
-                        //mPhotoView.draw(canvas);
-                        Log.d("FACE_DETECT", "Updated image");
                     }
                 }
 
