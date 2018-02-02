@@ -136,6 +136,20 @@ public class CrimeLab {
         return new File(externalFilesDir, crime.getThumbnail());
     }
 
+    /**
+     * Converts a {@link CrimeImage} to a {@link File} object to be rendered as a bitmap.
+     * @param image The {@link CrimeImage} to convert to a file.
+     * @return The file object.
+     */
+    public File getCrimeImageFile(CrimeImage image) {
+        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (externalFilesDir == null) {
+            return null;
+        }
+
+        return new File(externalFilesDir, image.getIdentifier());
+    }
+
     public void updateCrime(Crime crime) {
         String uuidString = crime.getId().toString();
         ContentValues values = getContentValues(crime);

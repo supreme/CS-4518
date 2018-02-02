@@ -1,15 +1,21 @@
 package com.bignerdranch.android.criminalintent;
 
-import android.content.Context;
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.Toast;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -21,16 +27,13 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class CrimeImageGallery extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String CRIME_ID = "CRIME_ID";
 
     private OnFragmentInteractionListener mListener;
+
+    private Crime crime;
+    private GridView gridView;
+    private List<CrimeImage> images;
 
     public CrimeImageGallery() {
         // Required empty public constructor
@@ -40,17 +43,15 @@ public class CrimeImageGallery extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param crimeId The UUID of the crime to display the fragment for.
      * @return A new instance of fragment CrimeImageGallery.
      */
-    // TODO: Rename and change types and number of parameters
-    public static CrimeImageGallery newInstance(String param1, String param2) {
+    public static CrimeImageGallery newInstance(UUID crimeId) {
         CrimeImageGallery fragment = new CrimeImageGallery();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable(CRIME_ID, crimeId);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -58,20 +59,36 @@ public class CrimeImageGallery extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            crime = CrimeLab.get(getActivity()).getCrime((UUID) getArguments().getSerializable(CRIME_ID));
         }
-
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_crime_image_gallery, container, false);
+
+        images = CrimeLab.get(getActivity()).getCrimeImages(crime);
+        List<Bitmap> bitmaps = new ArrayList<>();
+        for (CrimeImage image : images) {
+            File imageFile = CrimeLab.get(getActivity()).getCrimeImageFile(image);
+            bitmaps.add(PictureUtils.getScaledBitmap(imageFile.getPath(), getActivity()));
+        }
+
+        gridView = view.findViewById(R.id.gridView);
+        gridView.setAdapter(new ImageAdapter(getActivity(), bitmaps));
+        images = CrimeLab.get(getActivity()).getCrimeImages(crime);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                Toast.makeText(getActivity(), "" + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_crime_image_gallery, container, false);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
