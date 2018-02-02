@@ -1,5 +1,9 @@
 package com.bignerdranch.android.criminalintent;
 
+import android.util.Log;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -10,6 +14,7 @@ public class Crime {
     private Date mDate;
     private boolean mSolved;
     private String mSuspect;
+    private String thumbnail;
 
     public Crime() {
         this(UUID.randomUUID());
@@ -56,6 +61,20 @@ public class Crime {
     }
 
     public String getPhotoFilename() {
-        return "IMG_" + getId().toString() + ".jpg";
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH:mm:ss");
+        Date date = new Date();
+        return "IMG_" + dateFormat.format(date) + ".jpg";
+    }
+
+    public String getThumbnail() {
+//        if (thumbnail == null) {
+//            thumbnail = getPhotoFilename();
+//            Log.d("CAMERA", "Setting thumbnail: " + thumbnail);
+//        }
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }

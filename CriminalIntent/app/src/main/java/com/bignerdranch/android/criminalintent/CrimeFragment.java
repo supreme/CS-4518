@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -23,6 +24,7 @@ import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +37,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import com.google.android.gms.vision.Detector;
@@ -53,7 +57,8 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_PHOTO= 2;
 
     private Crime mCrime;
-    private File mPhotoFile;
+    private File thumbnailFile;
+    private File crimeImageFile;
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckbox;
@@ -79,7 +84,6 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
-        mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime);
     }
 
     @Override
@@ -163,7 +167,7 @@ public class CrimeFragment extends Fragment {
             mSuspectButton.setText(mCrime.getSuspect());
         }
 
-        PackageManager packageManager = getActivity().getPackageManager();
+        final PackageManager packageManager = getActivity().getPackageManager();
         if (packageManager.resolveActivity(pickContact,
                 PackageManager.MATCH_DEFAULT_ONLY) == null) {
             mSuspectButton.setEnabled(false);
@@ -172,22 +176,23 @@ public class CrimeFragment extends Fragment {
         mPhotoButton = (ImageButton) v.findViewById(R.id.crime_camera);
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        boolean canTakePhoto = mPhotoFile != null &&
-                captureImage.resolveActivity(packageManager) != null;
+        final boolean canTakePhoto = captureImage.resolveActivity(packageManager) != null;
         mPhotoButton.setEnabled(canTakePhoto);
-
-        if (canTakePhoto) {
-            Uri uri = Uri.fromFile(mPhotoFile);
-            captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-        }
 
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (canTakePhoto) {
+                    if (mCrime.getThumbnail() == null) {
+                        thumbnailFile = CrimeLab.get(getActivity()).getCrimeThumbnail(mCrime);
+                        captureImage.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(thumbnailFile));
+                    } else {
+                        crimeImageFile = CrimeLab.get(getActivity()).getCrimePhoto(mCrime);
+                        captureImage.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(crimeImageFile));
+                    }
+                }
+
                 startActivityForResult(captureImage, REQUEST_PHOTO);
-                //TODO: Add captured photo to database
-                //Bitmap bitmap = PictureUtils.getScaledBitmap(
-                //  mPhotoFile.getPath(), getActivity())
             }
         });
 
@@ -325,11 +330,11 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updatePhotoView() {
-        if (mPhotoFile == null || !mPhotoFile.exists()) {
+        File thumbnailFile = CrimeLab.get(getActivity()).getCrimeThumbnail(mCrime);
+        if (thumbnailFile == null || !thumbnailFile.exists()) {
             mPhotoView.setImageDrawable(null);
         } else {
-            Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFile.getPath(), getActivity());
+            Bitmap bitmap = PictureUtils.getScaledBitmap(thumbnailFile.getPath(), getActivity());
             mPhotoView.setImageBitmap(bitmap);
         }
     }
