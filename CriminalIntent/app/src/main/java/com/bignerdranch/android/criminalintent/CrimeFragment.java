@@ -7,6 +7,12 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PointF;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -16,6 +22,8 @@ import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
+import android.util.SparseArray;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +41,11 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
 
 public class CrimeFragment extends Fragment {
 
@@ -55,6 +68,8 @@ public class CrimeFragment extends Fragment {
     private ImageView mPhotoView;
     private Button mGalleryButton;
     private CheckBox mFaceDetectionBox;
+    private FaceDetector detector;
+    private Bitmap origBitmap;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -201,9 +216,40 @@ public class CrimeFragment extends Fragment {
         mFaceDetectionBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: Activate face detection
-            }
-        });
+                if(!mFaceDetectionBox.isChecked() && detector != null) {
+                    detector.release();
+                    if(origBitmap != null)
+                        mPhotoView.setImageDrawable(new BitmapDrawable(getResources(), origBitmap));
+                }
+                else if(mPhotoView.getDrawable() != null){
+                    detector = new FaceDetector.Builder(getContext()).setTrackingEnabled(false).setLandmarkType(FaceDetector.ALL_LANDMARKS).build();
+                    origBitmap = ((BitmapDrawable)mPhotoView.getDrawable()).getBitmap();
+                    Bitmap bitmapPhoto = ((BitmapDrawable)mPhotoView.getDrawable()).getBitmap();
+                    Bitmap tempBitmap = bitmapPhoto.copy(Bitmap.Config.ARGB_8888, true);
+                    Canvas canvas = new Canvas(tempBitmap);
+                    canvas.drawBitmap(bitmapPhoto,0,0,null);
+
+                    Paint p = new Paint();
+                    p.setColor(Color.GREEN);
+                    p.setStrokeWidth(5);
+                    p.setStyle(Paint.Style.STROKE);
+
+                    Frame frame = new Frame.Builder().setBitmap(bitmapPhoto).build();
+                    SparseArray<Face> faces = detector.detect(frame);
+
+                    for(int i = 0; i < faces.size(); i++) {
+                        Face face = faces.valueAt(i);
+
+                        float faceWidth = face.getWidth();
+                        float faceHeight = face.getHeight();
+                        PointF facePos = face.getPosition();
+                        RectF rect = new RectF(facePos.x, facePos.y, facePos.x+faceWidth, facePos.y+faceHeight);
+
+                        canvas.drawRoundRect(rect, 2, 2, p);
+                        mPhotoView.setImageDrawable(new BitmapDrawable(getResources(),tempBitmap));
+                    }
+                }
+        }});
 
         return v;
     }
