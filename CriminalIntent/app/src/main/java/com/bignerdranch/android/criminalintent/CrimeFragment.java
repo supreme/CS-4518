@@ -69,6 +69,7 @@ public class CrimeFragment extends Fragment {
     private Button mGalleryButton;
     private CheckBox mFaceDetectionBox;
     private FaceDetector detector;
+    private Bitmap origBitmap;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -215,10 +216,14 @@ public class CrimeFragment extends Fragment {
         mFaceDetectionBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!mFaceDetectionBox.isChecked() && detector != null)
+                if(!mFaceDetectionBox.isChecked() && detector != null) {
                     detector.release();
+                    if(origBitmap != null)
+                        mPhotoView.setImageDrawable(new BitmapDrawable(getResources(), origBitmap));
+                }
                 else if(mPhotoView.getDrawable() != null){
                     detector = new FaceDetector.Builder(getContext()).setTrackingEnabled(false).setLandmarkType(FaceDetector.ALL_LANDMARKS).build();
+                    origBitmap = ((BitmapDrawable)mPhotoView.getDrawable()).getBitmap();
                     Bitmap bitmapPhoto = ((BitmapDrawable)mPhotoView.getDrawable()).getBitmap();
                     Bitmap tempBitmap = bitmapPhoto.copy(Bitmap.Config.ARGB_8888, true);
                     Canvas canvas = new Canvas(tempBitmap);
