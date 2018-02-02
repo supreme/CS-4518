@@ -217,7 +217,7 @@ public class CrimeFragment extends Fragment {
             public void onClick(View v) {
                 if(!mFaceDetectionBox.isChecked() && detector != null)
                     detector.release();
-                else {
+                else if(mPhotoView.getDrawable() != null){
                     detector = new FaceDetector.Builder(getContext()).setTrackingEnabled(false).setLandmarkType(FaceDetector.ALL_LANDMARKS).build();
                     Bitmap bitmapPhoto = ((BitmapDrawable)mPhotoView.getDrawable()).getBitmap();
                     Bitmap tempBitmap = bitmapPhoto.copy(Bitmap.Config.ARGB_8888, true);
@@ -244,9 +244,6 @@ public class CrimeFragment extends Fragment {
                         mPhotoView.setImageDrawable(new BitmapDrawable(getResources(),tempBitmap));
                     }
                 }
-
-                Log.d("FACE_DETECT", "Reached End");
-
         }});
 
         return v;
