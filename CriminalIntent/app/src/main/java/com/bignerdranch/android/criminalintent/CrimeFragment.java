@@ -208,6 +208,10 @@ public class CrimeFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), CrimeImageGalleryActivity.class);
                 intent.putExtra("CRIME_ID", mCrime.getId());
+                if(mFaceDetectionBox.isChecked())
+                    intent.putExtra("FACE_DETECT", true);
+                else
+                    intent.putExtra("FACE_DETECT", false);
                 startActivity(intent);
             }
         });

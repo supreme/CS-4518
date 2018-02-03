@@ -1,18 +1,29 @@
 package com.bignerdranch.android.criminalintent;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PointF;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
+
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,10 +41,12 @@ import java.util.UUID;
  */
 public class CrimeImageGallery extends Fragment {
     private static final String CRIME_ID = "CRIME_ID";
+    private static final String FACE_DETECT = "FACE_DETECT";
 
     private OnFragmentInteractionListener mListener;
 
     private Crime crime;
+    private boolean faceDetect;
     private GridView gridView;
     private List<CrimeImage> images;
 
@@ -48,10 +61,11 @@ public class CrimeImageGallery extends Fragment {
      * @param crimeId The UUID of the crime to display the fragment for.
      * @return A new instance of fragment CrimeImageGallery.
      */
-    public static CrimeImageGallery newInstance(UUID crimeId) {
+    public static CrimeImageGallery newInstance(UUID crimeId, boolean faceDetect) {
         CrimeImageGallery fragment = new CrimeImageGallery();
         Bundle args = new Bundle();
         args.putSerializable(CRIME_ID, crimeId);
+        args.putSerializable(FACE_DETECT, faceDetect);
         fragment.setArguments(args);
 
         return fragment;
@@ -62,6 +76,7 @@ public class CrimeImageGallery extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             crime = CrimeLab.get(getActivity()).getCrime((UUID) getArguments().getSerializable(CRIME_ID));
+            faceDetect = (boolean) getArguments().getSerializable(FACE_DETECT);
         }
 
         AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -78,6 +93,35 @@ public class CrimeImageGallery extends Fragment {
         for (CrimeImage image : images) {
             File imageFile = CrimeLab.get(getActivity()).getCrimeImageFile(image);
             bitmaps.add(PictureUtils.getScaledBitmap(imageFile.getPath(), getActivity()));
+        }
+
+        if(faceDetect) {
+            for (Bitmap bm : bitmaps) {
+                FaceDetector detector = new FaceDetector.Builder(getContext()).setTrackingEnabled(false).setLandmarkType(FaceDetector.ALL_LANDMARKS).build();
+                Bitmap tempBitmap = bm.copy(Bitmap.Config.ARGB_8888, true);
+                Canvas canvas = new Canvas(tempBitmap);
+                canvas.drawBitmap(bm, 0, 0, null);
+
+                Paint p = new Paint();
+                p.setColor(Color.GREEN);
+                p.setStrokeWidth(5);
+                p.setStyle(Paint.Style.STROKE);
+
+                Frame frame = new Frame.Builder().setBitmap(bm).build();
+                SparseArray<Face> faces = detector.detect(frame);
+
+                for (int i = 0; i < faces.size(); i++) {
+                    Face face = faces.valueAt(i);
+
+                    float faceWidth = face.getWidth();
+                    float faceHeight = face.getHeight();
+                    PointF facePos = face.getPosition();
+                    RectF rect = new RectF(facePos.x, facePos.y, facePos.x + faceWidth, facePos.y + faceHeight);
+
+                    canvas.drawRoundRect(rect, 2, 2, p);
+                    bm = tempBitmap;
+                }
+            }
         }
 
         // Get screen size

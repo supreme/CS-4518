@@ -13,7 +13,8 @@ public class CrimeImageGalleryActivity extends SingleFragmentActivity {
     @Override
     protected Fragment createFragment(){
         UUID crimeId = (UUID) getIntent().getSerializableExtra("CRIME_ID");
-        return CrimeImageGallery.newInstance(crimeId);
+        boolean faceDetect = (boolean) getIntent().getSerializableExtra("FACE_DETECT");
+        return CrimeImageGallery.newInstance(crimeId, faceDetect);
     }
 
     @Override
