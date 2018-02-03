@@ -96,22 +96,23 @@ public class CrimeImageGallery extends Fragment {
         }
 
         if(faceDetect) {
-            for (Bitmap bm : bitmaps) {
+            for (int i = 0; i < bitmaps.size(); i++) {
                 FaceDetector detector = new FaceDetector.Builder(getContext()).setTrackingEnabled(false).setLandmarkType(FaceDetector.ALL_LANDMARKS).build();
-                Bitmap tempBitmap = bm.copy(Bitmap.Config.ARGB_8888, true);
+                Bitmap bitmapPhoto = bitmaps.get(i);
+                Bitmap tempBitmap = bitmapPhoto.copy(Bitmap.Config.ARGB_8888, true);
                 Canvas canvas = new Canvas(tempBitmap);
-                canvas.drawBitmap(bm, 0, 0, null);
+                canvas.drawBitmap(bitmapPhoto, 0, 0, null);
 
                 Paint p = new Paint();
                 p.setColor(Color.GREEN);
                 p.setStrokeWidth(5);
                 p.setStyle(Paint.Style.STROKE);
 
-                Frame frame = new Frame.Builder().setBitmap(bm).build();
+                Frame frame = new Frame.Builder().setBitmap(bitmapPhoto).build();
                 SparseArray<Face> faces = detector.detect(frame);
 
-                for (int i = 0; i < faces.size(); i++) {
-                    Face face = faces.valueAt(i);
+                for (int j = 0; j < faces.size(); j++) {
+                    Face face = faces.valueAt(j);
 
                     float faceWidth = face.getWidth();
                     float faceHeight = face.getHeight();
@@ -119,8 +120,9 @@ public class CrimeImageGallery extends Fragment {
                     RectF rect = new RectF(facePos.x, facePos.y, facePos.x + faceWidth, facePos.y + faceHeight);
 
                     canvas.drawRoundRect(rect, 2, 2, p);
-                    bm = tempBitmap;
                 }
+
+                bitmaps.set(i, tempBitmap);
             }
         }
 

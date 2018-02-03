@@ -250,8 +250,9 @@ public class CrimeFragment extends Fragment {
                         RectF rect = new RectF(facePos.x, facePos.y, facePos.x+faceWidth, facePos.y+faceHeight);
 
                         canvas.drawRoundRect(rect, 2, 2, p);
-                        mPhotoView.setImageDrawable(new BitmapDrawable(getResources(),tempBitmap));
                     }
+
+                    mPhotoView.setImageDrawable(new BitmapDrawable(getResources(),tempBitmap));
                 }
         }});
 
