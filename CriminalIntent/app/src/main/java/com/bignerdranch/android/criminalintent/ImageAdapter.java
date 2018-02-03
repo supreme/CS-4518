@@ -14,10 +14,12 @@ import java.util.List;
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     private List<Bitmap> images;
+    private int imageWidth;
 
-    public ImageAdapter(Context c, List<Bitmap> images) {
+    public ImageAdapter(Context c, List<Bitmap> images, int screenWidth) {
         mContext = c;
         this.images = images;
+        this.imageWidth = screenWidth/3;
     }
 
     public int getCount() {
@@ -38,7 +40,7 @@ public class ImageAdapter extends BaseAdapter {
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(450, 450));
+            imageView.setLayoutParams(new GridView.LayoutParams(imageWidth, imageWidth));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
         } else {

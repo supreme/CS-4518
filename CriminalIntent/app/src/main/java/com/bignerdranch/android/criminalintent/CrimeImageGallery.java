@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +72,7 @@ public class CrimeImageGallery extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_crime_image_gallery, container, false);
 
+        // Convert all crime images to bitmaps
         images = CrimeLab.get(getActivity()).getCrimeImages(crime);
         List<Bitmap> bitmaps = new ArrayList<>();
         for (CrimeImage image : images) {
@@ -77,8 +80,13 @@ public class CrimeImageGallery extends Fragment {
             bitmaps.add(PictureUtils.getScaledBitmap(imageFile.getPath(), getActivity()));
         }
 
+        // Get screen size
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        // Setup grid view
         gridView = view.findViewById(R.id.gridView);
-        gridView.setAdapter(new ImageAdapter(getActivity(), bitmaps));
+        gridView.setAdapter(new ImageAdapter(getActivity(), bitmaps, metrics.widthPixels));
         images = CrimeLab.get(getActivity()).getCrimeImages(crime);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
