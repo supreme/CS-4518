@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Project3</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="visits_to_fuller_labs_geofence">Visits to Fuller Labs GeoFence: %d</string>
+    <string name="visits_to_library_geofence">Visits to Library GeoFence: %d</string>
+    <string name="you_are">You are %s</string>
+</resources>
