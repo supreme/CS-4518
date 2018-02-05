@@ -27,7 +27,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private static final int DEFAULT_ZOOM = 17;
+    private static final int DEFAULT_ZOOM = 17; // Higher value, higher zoom
+    private final int MIN_TIME = 3000;     // Minimum time between updates in milliseconds
+    private final int MIN_DISTANCE = 3;    // Minimum distance between updates in meters
 
     private TextView fuller_visits;
     private int fuller_counter = 0;
@@ -35,8 +37,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView library_visits;
     private int library_counter = 0;
 
-    GoogleMap mMap;
-    LocationManager locationManager;
+    private GoogleMap mMap;
+    private LocationManager locationManager;
+    private static Criteria criteria;
 
     private ImageView activity_image;
     private TextView text_activity;
@@ -79,11 +82,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         MapsInitializer.initialize(MainActivity.this);
         mMap.setMyLocationEnabled(true);
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        initLocationManager();
+
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                //TODO: This is where we should check if the user has entered a geofence
+                locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), MIN_TIME, MIN_DISTANCE, this);
+                Location current = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
+                LatLng currentLatLong = new LatLng(current.getLatitude(), current.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLong, DEFAULT_ZOOM));
             }
 
             @Override
@@ -117,6 +124,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
         }
+    }
+
+    private void initLocationManager(){
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAltitudeRequired(true);
+        criteria.setBearingRequired(true);
+        criteria.setSpeedRequired(true);
+        criteria.setCostAllowed(true);
     }
 
 
