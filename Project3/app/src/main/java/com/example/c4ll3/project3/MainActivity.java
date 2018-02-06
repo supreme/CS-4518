@@ -2,11 +2,20 @@ package com.example.c4ll3.project3;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +23,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,11 +35,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
-
-    private static final int DEFAULT_ZOOM = 17; // Higher value, higher zoom
-    private final int MIN_TIME = 3000;     // Minimum time between updates in milliseconds
-    private final int MIN_DISTANCE = 3;    // Minimum distance between updates in meters
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, SensorEventListener {
 
     private TextView fuller_visits;
     private int fuller_counter = 0;
@@ -37,13 +43,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView library_visits;
     private int library_counter = 0;
 
-    private GoogleMap mMap;
-    private LocationManager locationManager;
-    private static Criteria criteria;
-
     private ImageView activity_image;
     private TextView text_activity;
     private String activity = "Still";
+
+    // Map
+    private GoogleMap mMap;
+    private LocationManager locationManager;
+    private static Criteria criteria;
+    private static final int DEFAULT_ZOOM = 17; // Higher value, higher zoom
+    private final int MIN_TIME = 3000;     // Minimum time between updates in milliseconds
+    private final int MIN_DISTANCE = 3;    // Minimum distance between updates in meters
+
+    // Pedometer
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    private int stepCount = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +73,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.getMapAsync(this);
         mapView.onResume();
 
+        // Initialize pedometer and begin listening for steps
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        if(mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
+            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        }
+
+
         // Get UI elements and fill with default values
         fuller_visits = findViewById(R.id.text_fuller);
         library_visits = findViewById(R.id.text_library);
@@ -65,6 +89,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fuller_visits.setText(getString(R.string.visits_to_fuller_labs_geofence, fuller_counter));
         library_visits.setText(getString(R.string.visits_to_library_geofence, library_counter));
         text_activity.setText(getString(R.string.you_are, activity));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+           mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+           mSensorManager.unregisterListener(this);
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        stepCount++;
+        Toast.makeText(this, stepCount, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     /**
@@ -76,7 +124,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap){
         mMap = googleMap;
-        System.out.println("In  onMapReady");
 
         checkPermissions();
 
@@ -136,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         criteria.setSpeedRequired(true);
         criteria.setCostAllowed(true);
     }
-
-
-
 }
+
+
