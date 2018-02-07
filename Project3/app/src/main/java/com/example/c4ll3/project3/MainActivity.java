@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView text_activity;
     private String activity = "Still";
 
+    private GeofenceClient mGeofencingClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +85,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fuller_visits.setText(getString(R.string.visits_to_fuller_labs_geofence, fuller_counter));
         library_visits.setText(getString(R.string.visits_to_library_geofence, library_counter));
         text_activity.setText(getString(R.string.you_are, activity));
+        mGeofencingClient = LocationServices.getGeofencingClient(this);
+        mGeofencingClient.add(new Geofence.Builder()
+            .setRequestID(entry.getKey())
+            .setCircularRegion(
+                    entry.getValue().latitude,
+                    entry.getValue().longitude,
+                    Constants.GEOFENCE_RADIUS_IN_METERS
+            )
+            .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+            .setTransitionTypes(GEOFENCE_TRANSITION_ENTER|
+                Geofence.GEOFENCE_TRANSITION_EXIT)
+            .build());
     }
 
     /**
