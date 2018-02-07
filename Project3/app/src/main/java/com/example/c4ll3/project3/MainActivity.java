@@ -7,23 +7,21 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -39,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private LocationManager locationManager;
+    private String bestLocationProvider;
     private static Criteria criteria;
 
     private ImageView activity_image;
@@ -87,8 +86,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), MIN_TIME, MIN_DISTANCE, this);
-                Location current = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
+                locationManager.requestLocationUpdates(bestLocationProvider, MIN_TIME, MIN_DISTANCE, this);
+                Location current = locationManager.getLastKnownLocation(bestLocationProvider);
                 LatLng currentLatLong = new LatLng(current.getLatitude(), current.getLongitude());
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLong, DEFAULT_ZOOM));
             }
@@ -109,12 +108,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         };
 
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(bestLocationProvider, 0, 0, locationListener);
 
         // Sets GPS's last known location as default for when map is created
-        Location lastKnown = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
-        LatLng defaultLatLong = new LatLng(lastKnown.getLatitude(), lastKnown.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLatLong, DEFAULT_ZOOM));
+        Location lastKnown = locationManager.getLastKnownLocation(bestLocationProvider);
+        if (lastKnown != null) {
+            LatLng defaultLatLong = new LatLng(lastKnown.getLatitude(), lastKnown.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLatLong, DEFAULT_ZOOM));
+        }
     }
 
     // Check if user has given us location access, if not ask them for it
@@ -128,6 +129,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void initLocationManager(){
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        // Determine which services are available to use for location services
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        if (!isGPSEnabled && !isNetworkEnabled) {
+            Toast.makeText(getApplicationContext(), "Unable to use location services!", Toast.LENGTH_LONG);
+        }
+
         criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
@@ -135,6 +144,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         criteria.setBearingRequired(true);
         criteria.setSpeedRequired(true);
         criteria.setCostAllowed(true);
+
+        // Get best provider from available selection
+        bestLocationProvider = locationManager.getBestProvider(criteria, true);
+        Log.d("steve", "Best location provider: " + bestLocationProvider);
     }
 
 
