@@ -2,12 +2,19 @@ package com.example.c4ll3.project3;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +23,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.location.ActivityRecognitionClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -23,11 +34,16 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    private final int ACTIVITY_CHECK_DELAY = 1000; // Check for activity every second
     private static final int DEFAULT_ZOOM = 17; // Higher value, higher zoom
     private final int MIN_TIME = 3000;     // Minimum time between updates in milliseconds
     private final int MIN_DISTANCE = 3;    // Minimum distance between updates in meters
+
+    // Google Play Services API client
+    private GoogleApiClient apiClient;
+    private Handler activityHandler;
 
     private TextView fuller_visits;
     private int fuller_counter = 0;
@@ -55,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
         mapView.onResume();
+
+        // Initialize Google Play Services
+        initGooglePlayServices();
 
         // Get UI elements and fill with default values
         fuller_visits = findViewById(R.id.text_fuller);
@@ -151,5 +170,51 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    /**
+     * ----------------------------------------
+     * Begin section for Google Play Services.
+     * ----------------------------------------
+     */
 
+    /**
+     * Initialize Google Play Services API client.
+     */
+    private void initGooglePlayServices() {
+        apiClient = new GoogleApiClient.Builder(this)
+                .addApi(ActivityRecognition.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        apiClient.connect();
+
+        activityHandler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message msg) {
+                Bundle reply = msg.getData();
+                text_activity.setText("You are " + reply.getString("ACTIVITY"));
+                Log.d("steve", "GOT REPLY: " + reply.getString("ACTIVITY"));
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Intent intent = new Intent(this, ActivityRecognizedService.class);
+        intent.putExtra("messenger", new Messenger(activityHandler));
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        ActivityRecognitionClient activityRecognitionClient = ActivityRecognition.getClient(getApplicationContext());
+        activityRecognitionClient.requestActivityUpdates(ACTIVITY_CHECK_DELAY, pendingIntent);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }
