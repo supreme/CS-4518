@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // Pedometer
     private SensorManager mSensorManager;
     private Sensor mSensor;
-    private int stepCount = 0;
+    public static int stepCount = 0;
     private final int STEP_COUNT_IN_GEOFENCE = 6;
     public static boolean inFullerGeofence = false;
     public static boolean inLibraryGeofence = false;
