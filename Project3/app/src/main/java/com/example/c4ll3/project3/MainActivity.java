@@ -59,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private int stepCount = 0;
+    private final int STEP_COUNT_IN_GEOFENCE = 6;
+    private boolean inFullerGeofence = false;
+    private boolean inLibraryGeofence = false;
 
 
     @Override
@@ -106,8 +109,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        stepCount++;
-        Toast.makeText(this, String.valueOf(stepCount), Toast.LENGTH_SHORT).show();
+        if (inFullerGeofence){
+            stepCount++;
+            if (stepCount == STEP_COUNT_IN_GEOFENCE){
+                fuller_visits.setText(getString(R.string.visits_to_fuller_labs_geofence, fuller_counter));
+                Toast.makeText(this, "You have taken 6 steps inside Fuller Labs Geofence, incrementing counter", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (inLibraryGeofence){
+            stepCount++;
+            if (stepCount == STEP_COUNT_IN_GEOFENCE){
+                library_visits.setText(getString(R.string.visits_to_library_geofence, library_counter));
+                Toast.makeText(this, "You have taken 6 steps inside the Gordon Library Geofence, incrementing counter", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
