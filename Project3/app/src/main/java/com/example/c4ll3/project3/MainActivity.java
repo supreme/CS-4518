@@ -38,6 +38,9 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final int ACTIVITY_CHECK_DELAY = 1000; // Check for activity every second
@@ -65,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String activity = "Still";
 
     private GeofencingClient mGeofencingClient;
+    private ArrayList<Geofence> mGeofenceList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,17 +94,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         library_visits.setText(getString(R.string.visits_to_library_geofence, library_counter));
         text_activity.setText(getString(R.string.you_are, activity));
         mGeofencingClient = LocationServices.getGeofencingClient(this);
-        mGeofencingClient.add(new Geofence.Builder()
-            .setRequestID(entry.getKey())
-            .setCircularRegion(
-                    entry.getValue().latitude,
-                    entry.getValue().longitude,
-                    Constants.GEOFENCE_RADIUS_IN_METERS
-            )
-            .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-            .setTransitionTypes(GEOFENCE_TRANSITION_ENTER|
-                Geofence.GEOFENCE_TRANSITION_EXIT)
-            .build());
+
+        mGeofenceList = new ArrayList<Geofence>();
+
+        for(Map.Entry<String, LatLng> entry : Constants.LANDMARKS.entrySet()) {
+
+            mGeofenceList.add(new Geofence.Builder()
+                    .setRequestId(entry.getKey())
+                    .setCircularRegion(
+                            entry.getValue().latitude,
+                            entry.getValue().longitude,
+                            Constants.GEOFENCE_RADIUS_IN_METERS
+                    )
+                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER|
+                            Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .build());
+        }
     }
 
     /**
