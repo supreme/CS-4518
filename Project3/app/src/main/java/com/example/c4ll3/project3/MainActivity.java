@@ -34,6 +34,10 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.LocationServices;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private final int ACTIVITY_CHECK_DELAY = 1000; // Check for activity every second
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView text_activity;
     private String activity = "Still";
 
-    private GeofenceClient mGeofencingClient;
+    private GeofencingClient mGeofencingClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
