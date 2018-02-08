@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.usage.ConfigurationStats;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -56,8 +57,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, SensorEventListener {
 
     public static final String TAG = "MainActivity";
-
-    private final int ACTIVITY_CHECK_DELAY = 1000; // Check for activity every second
 
     // Google Play Services API client
     private GoogleApiClient apiClient;
@@ -119,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         // Get UI elements and fill with default values
+        activity_image = findViewById(R.id.acitivty_image);
         fuller_visits = findViewById(R.id.text_fuller);
         library_visits = findViewById(R.id.text_library);
         text_activity = findViewById(R.id.text_activity);
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         if (!isGPSEnabled && !isNetworkEnabled) {
-            Toast.makeText(getApplicationContext(), "Unable to use location services!", Toast.LENGTH_LONG);
+            Toast.makeText(getApplicationContext(), "Unable to use location services!", Toast.LENGTH_LONG).show();
         }
 
         criteria = new Criteria();
@@ -244,7 +244,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Get best provider from available selection
         bestLocationProvider = locationManager.getBestProvider(criteria, true);
-        Log.d("steve", "Best location provider: " + bestLocationProvider);
     }
 
 
@@ -263,15 +262,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-
         apiClient.connect();
 
+        // Callback handler for activity recognition service
         activityHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
-                Bundle reply = msg.getData();
-                text_activity.setText("You are " + reply.getString("ACTIVITY"));
-                Log.d("steve", "GOT REPLY: " + reply.getString("ACTIVITY"));
+                String activity = msg.getData().getString(Constants.ACTIVITY_MESSAGE_TAG);
+                text_activity.setText(getString(R.string.you_are, activity));
+
+                // Set image view based on activity
+                if (activity.equals(getString(R.string.activity_still))) {
+                    activity_image.setImageDrawable(getResources().getDrawable(R.drawable.still));
+                } else if (activity.equals(getString(R.string.activity_walking))) {
+                    activity_image.setImageDrawable(getResources().getDrawable(R.drawable.walking));
+                } else if (activity.equals(getString(R.string.activity_running))) {
+                    activity_image.setImageDrawable(getResources().getDrawable(R.drawable.running));
+                }
+
                 return false;
             }
         });
@@ -283,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra("messenger", new Messenger(activityHandler));
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         ActivityRecognitionClient activityRecognitionClient = ActivityRecognition.getClient(getApplicationContext());
-        activityRecognitionClient.requestActivityUpdates(ACTIVITY_CHECK_DELAY, pendingIntent);
+        activityRecognitionClient.requestActivityUpdates(Constants.ACTIVITY_CHECK_DELAY, pendingIntent);
     }
 
     @Override
