@@ -3,6 +3,7 @@ package com.example.c4ll3.project3;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
+import android.app.usage.ConfigurationStats;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -262,19 +264,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void startGeofenceMonitoring() {
         try{
-            //Library
             //BUILDING A GEOFENCE
             Geofence libraryGeofence = new Geofence.Builder()
-                    .setRequestId(LIBRARY_GEOFENCE_ID)
-                    .setCircularRegion(LIBRARY_LAT, LIBRARY_LONG, LIBRARY_RADIUS)
-                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setRequestId(Constants.LANDMARKS.get("Library").geofenceID)
+                    .setCircularRegion(Constants.LANDMARKS.get("Library").latitude, Constants.LANDMARKS.get("Library").longitude, Constants.LANDMARKS.get("Library").radius)
+                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
                     .setNotificationResponsiveness(1000)//in milliseconds
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                     .build();
             Geofence fullerGeofence = new Geofence.Builder()
-                    .setRequestId(FULLER_GEOFENCE_ID)
-                    .setCircularRegion(FULLER_LAT, FULLER_LONG, FULLER_RADIUS)
-                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setRequestId(Constants.LANDMARKS.get("FullerLabs").geofenceID)
+                    .setCircularRegion(Constants.LANDMARKS.get("FullerLabs").latitude, Constants.LANDMARKS.get("FullerLabs").longitude, Constants.LANDMARKS.get("FullerLabs").radius)
+                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
                     .setNotificationResponsiveness(1000)//in milliseconds
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                     .build();
