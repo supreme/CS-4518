@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onSensorChanged(SensorEvent event) {
         stepCount++;
-        Toast.makeText(this, stepCount, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, String.valueOf(stepCount), Toast.LENGTH_SHORT).show();
     }
 
     @Override
