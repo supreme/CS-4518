@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Sensor mSensor;
     private int stepCount = 0;
     private final int STEP_COUNT_IN_GEOFENCE = 6;
-    private boolean inFullerGeofence = false;
-    private boolean inLibraryGeofence = false;
+    public static boolean inFullerGeofence = false;
+    public static boolean inLibraryGeofence = false;
 
 
     private FusedLocationProviderClient mFusedLocationProviderClient;

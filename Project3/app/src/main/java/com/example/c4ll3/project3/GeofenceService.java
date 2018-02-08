@@ -27,15 +27,22 @@ public class GeofenceService extends IntentService {
         } else {
             int transition = event.getGeofenceTransition();
             List<Geofence> geofences = event.getTriggeringGeofences();
-            Geofence geofence = geofences.get(0);
-            String requestId = geofence.getRequestId();
+            for (Geofence geofence : geofences) {
+                String requestId = geofence.getRequestId();
 
-            if(transition == Geofence.GEOFENCE_TRANSITION_ENTER){
-                Log.d(TAG, "Entering geofence - " + requestId);
-                MainActivity.inGeofence = true;
-            } else if(transition == Geofence.GEOFENCE_TRANSITION_EXIT){
-                Log.d(TAG, "Exiting geofence - " + requestId);
-                MainActivity.inGeofence = false;
+                if (transition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+                    Log.d(TAG, "Entering geofence - " + requestId);
+                    if(requestId.equals("LibraryGeofence"))
+                        MainActivity.inLibraryGeofence = true;
+                    else if(requestId.equals("FullerGeofence"))
+                        MainActivity.inFullerGeofence = true;
+                } else if (transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+                    Log.d(TAG, "Exiting geofence - " + requestId);
+                    if(requestId.equals("Library Geofence"))
+                        MainActivity.inLibraryGeofence = false;
+                    else if(requestId.equals("FullerGeofence"))
+                        MainActivity.inFullerGeofence = false;
+                }
             }
         }
     }
