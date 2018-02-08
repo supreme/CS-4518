@@ -5,6 +5,10 @@ import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -41,12 +45,9 @@ import com.google.android.gms.location.LocationServices;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, SensorEventListener {
 
     private final int ACTIVITY_CHECK_DELAY = 1000; // Check for activity every second
-    private static final int DEFAULT_ZOOM = 17; // Higher value, higher zoom
-    private final int MIN_TIME = 3000;     // Minimum time between updates in milliseconds
-    private final int MIN_DISTANCE = 3;    // Minimum distance between updates in meters
 
     // Google Play Services API client
     private GoogleApiClient apiClient;
@@ -58,14 +59,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView library_visits;
     private int library_counter = 0;
 
+    private ImageView activity_image;
+    private TextView text_activity;
+    private String activity = "Still";
+
+    // Map
     private GoogleMap mMap;
     private LocationManager locationManager;
     private String bestLocationProvider;
     private static Criteria criteria;
+    private static final int DEFAULT_ZOOM = 17; // Higher value, higher zoom
+    private final int MIN_TIME = 3000;     // Minimum time between updates in milliseconds
+    private final int MIN_DISTANCE = 3;    // Minimum distance between updates in meters
 
-    private ImageView activity_image;
-    private TextView text_activity;
-    private String activity = "Still";
+    // Pedometer
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    private int stepCount = 0;
+    private final int STEP_COUNT_IN_GEOFENCE = 6;
+    private boolean inFullerGeofence = false;
+    private boolean inLibraryGeofence = false;
+
 
     private GeofencingClient mGeofencingClient;
     private ArrayList<Geofence> mGeofenceList;
@@ -84,6 +98,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Initialize Google Play Services
         initGooglePlayServices();
+
+        // Initialize pedometer and begin listening for steps
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        if(mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
+            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
+        }
 
         // Get UI elements and fill with default values
         fuller_visits = findViewById(R.id.text_fuller);
@@ -113,6 +134,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+           mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+           mSensorManager.unregisterListener(this);
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (inFullerGeofence){
+            stepCount++;
+            if (stepCount == STEP_COUNT_IN_GEOFENCE){
+                fuller_visits.setText(getString(R.string.visits_to_fuller_labs_geofence, fuller_counter));
+                Toast.makeText(this, "You have taken 6 steps inside Fuller Labs Geofence, incrementing counter", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (inLibraryGeofence){
+            stepCount++;
+            if (stepCount == STEP_COUNT_IN_GEOFENCE){
+                library_visits.setText(getString(R.string.visits_to_library_geofence, library_counter));
+                Toast.makeText(this, "You have taken 6 steps inside the Gordon Library Geofence, incrementing counter", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -122,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap){
         mMap = googleMap;
-        System.out.println("In  onMapReady");
 
         checkPermissions();
 
