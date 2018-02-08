@@ -50,7 +50,6 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String TAG = "MainActivity";
-    public static final String GEOFENCE_ID = "LibraryGeofence";
 
     private final int ACTIVITY_CHECK_DELAY = 1000; // Check for activity every second
     private static final int DEFAULT_ZOOM = 17; // Higher value, higher zoom
@@ -78,9 +77,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GeofencingClient mGeofencingClient;
+    public static final String LIBRARY_GEOFENCE_ID = "LibraryGeofence";
     private final float LIBRARY_LAT = 0;
     private final float LIBRARY_LONG = 0;
     private final int LIBRARY_RADIUS = 0;//in meters
+
+    public static final String FULLER_GEOFENCE_ID = "FullerGeofence";
+    private final float FULLER_LAT = 0;
+    private final float FULLER_LONG = 0;
+    private final int FULLER_RADIUS = 0;//in meters
+
+    public static boolean inGeofence = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -255,17 +262,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void startGeofenceMonitoring() {
         try{
+            //Library
             //BUILDING A GEOFENCE
-            Geofence geofence = new Geofence.Builder()
-                    .setRequestId(GEOFENCE_ID)
+            Geofence libraryGeofence = new Geofence.Builder()
+                    .setRequestId(LIBRARY_GEOFENCE_ID)
                     .setCircularRegion(LIBRARY_LAT, LIBRARY_LONG, LIBRARY_RADIUS)
                     .setExpirationDuration(Geofence.NEVER_EXPIRE)
                     .setNotificationResponsiveness(1000)//in milliseconds
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                     .build();
+            Geofence fullerGeofence = new Geofence.Builder()
+                    .setRequestId(FULLER_GEOFENCE_ID)
+                    .setCircularRegion(FULLER_LAT, FULLER_LONG, FULLER_RADIUS)
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setNotificationResponsiveness(1000)//in milliseconds
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .build();
+
             GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
                     .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                    .addGeofence(geofence).build();
+                    .addGeofence(libraryGeofence)
+                    .addGeofence(fullerGeofence)
+                    .build();
+
             Intent intent = new Intent(this, GeofenceService.class);
             PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -282,7 +301,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void stopGeofenceMonitoring(){
         Log.d(TAG, "stopMonitoring called");
         ArrayList<String> geofenceIds = new ArrayList<String>();
-        geofenceIds.add(GEOFENCE_ID);
+        geofenceIds.add(LIBRARY_GEOFENCE_ID);
+        geofenceIds.add(FULLER_GEOFENCE_ID);
         mGeofencingClient.removeGeofences(geofenceIds);
     }
 

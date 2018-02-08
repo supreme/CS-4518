@@ -4,4 +4,6 @@
     <string name="visits_to_fuller_labs_geofence">Visits to Fuller Labs GeoFence: %d</string>
     <string name="visits_to_library_geofence">Visits to Library GeoFence: %d</string>
     <string name="you_are">You are %s</string>
+    <string name="LIBRARY_GEOFENCE_ID">LibraryGeofence</string>
+    <string name="FULLER_GEOFENCE_ID">FullerGeofence</string>
 </resources>
