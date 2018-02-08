@@ -79,15 +79,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GeofencingClient mGeofencingClient;
-    public static final String LIBRARY_GEOFENCE_ID = "LibraryGeofence";
-    private final float LIBRARY_LAT = 0;
-    private final float LIBRARY_LONG = 0;
-    private final int LIBRARY_RADIUS = 0;//in meters
-
-    public static final String FULLER_GEOFENCE_ID = "FullerGeofence";
-    private final float FULLER_LAT = 0;
-    private final float FULLER_LONG = 0;
-    private final int FULLER_RADIUS = 0;//in meters
 
     public static boolean inGeofence = false;
 
@@ -264,26 +255,38 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void startGeofenceMonitoring() {
         try{
+            List<Geofence> geofenceList = new ArrayList<>();
+            for(String k : Constants.LANDMARKS.keySet()){
+                Geofence tempGeo = new Geofence.Builder()
+                        .setRequestId(Constants.LANDMARKS.get(k).geofenceID)
+                        .setCircularRegion(Constants.LANDMARKS.get(k).latitude, Constants.LANDMARKS.get(k).longitude, Constants.LANDMARKS.get(k).radius)
+                        .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+                        .setNotificationResponsiveness(1000)//in milliseconds
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                        .build();
+                geofenceList.add(tempGeo);
+            }
             //BUILDING A GEOFENCE
-            Geofence libraryGeofence = new Geofence.Builder()
-                    .setRequestId(Constants.LANDMARKS.get("Library").geofenceID)
-                    .setCircularRegion(Constants.LANDMARKS.get("Library").latitude, Constants.LANDMARKS.get("Library").longitude, Constants.LANDMARKS.get("Library").radius)
-                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-                    .setNotificationResponsiveness(1000)//in milliseconds
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .build();
-            Geofence fullerGeofence = new Geofence.Builder()
-                    .setRequestId(Constants.LANDMARKS.get("FullerLabs").geofenceID)
-                    .setCircularRegion(Constants.LANDMARKS.get("FullerLabs").latitude, Constants.LANDMARKS.get("FullerLabs").longitude, Constants.LANDMARKS.get("FullerLabs").radius)
-                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-                    .setNotificationResponsiveness(1000)//in milliseconds
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .build();
+//            Geofence libraryGeofence = new Geofence.Builder()
+//                    .setRequestId(Constants.LANDMARKS.get("Library").geofenceID)
+//                    .setCircularRegion(Constants.LANDMARKS.get("Library").latitude, Constants.LANDMARKS.get("Library").longitude, Constants.LANDMARKS.get("Library").radius)
+//                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+//                    .setNotificationResponsiveness(1000)//in milliseconds
+//                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+//                    .build();
+//            Geofence fullerGeofence = new Geofence.Builder()
+//                    .setRequestId(Constants.LANDMARKS.get("FullerLabs").geofenceID)
+//                    .setCircularRegion(Constants.LANDMARKS.get("FullerLabs").latitude, Constants.LANDMARKS.get("FullerLabs").longitude, Constants.LANDMARKS.get("FullerLabs").radius)
+//                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+//                    .setNotificationResponsiveness(1000)//in milliseconds
+//                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+//                    .build();
 
             GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
                     .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                    .addGeofence(libraryGeofence)
-                    .addGeofence(fullerGeofence)
+                    .addGeofences(geofenceList)
+//                    .addGeofence(libraryGeofence)
+//                    .addGeofence(fullerGeofence)
                     .build();
 
             Intent intent = new Intent(this, GeofenceService.class);
@@ -302,8 +305,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void stopGeofenceMonitoring(){
         Log.d(TAG, "stopMonitoring called");
         ArrayList<String> geofenceIds = new ArrayList<String>();
-        geofenceIds.add(LIBRARY_GEOFENCE_ID);
-        geofenceIds.add(FULLER_GEOFENCE_ID);
+        for(String k : Constants.LANDMARKS.keySet()){
+            geofenceIds.add(Constants.LANDMARKS.get(k).geofenceID);
+        }
         mGeofencingClient.removeGeofences(geofenceIds);
     }
 
