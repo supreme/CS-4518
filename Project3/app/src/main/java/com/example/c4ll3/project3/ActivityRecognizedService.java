@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
+import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.List;
 

@@ -11,6 +11,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.annotation.NonNull;
@@ -22,11 +23,21 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.Looper;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -34,7 +45,12 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+
+    public static final String TAG = "MainActivity";
+    public static final String GEOFENCE_ID = "LibraryGeofence";
 
     private final int ACTIVITY_CHECK_DELAY = 1000; // Check for activity every second
     private static final int DEFAULT_ZOOM = 17; // Higher value, higher zoom
@@ -60,7 +76,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView text_activity;
     private String activity = "Still";
 
-    private GeofenceClient mGeofencingClient;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private GeofencingClient mGeofencingClient;
+    private final float LIBRARY_LAT = 0;
+    private final float LIBRARY_LONG = 0;
+    private final int LIBRARY_RADIUS = 0;//in meters
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,18 +105,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         fuller_visits.setText(getString(R.string.visits_to_fuller_labs_geofence, fuller_counter));
         library_visits.setText(getString(R.string.visits_to_library_geofence, library_counter));
         text_activity.setText(getString(R.string.you_are, activity));
-        mGeofencingClient = LocationServices.getGeofencingClient(this);
-        mGeofencingClient.add(new Geofence.Builder()
-            .setRequestID(entry.getKey())
-            .setCircularRegion(
-                    entry.getValue().latitude,
-                    entry.getValue().longitude,
-                    Constants.GEOFENCE_RADIUS_IN_METERS
-            )
-            .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-            .setTransitionTypes(GEOFENCE_TRANSITION_ENTER|
-                Geofence.GEOFENCE_TRANSITION_EXIT)
-            .build());
     }
 
     /**
@@ -231,4 +239,51 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+    private void startLocationMonitoring(){
+        Log.d(TAG, "startLocation called");
+        try {
+            LocationRequest locationRequest = LocationRequest.create()
+                    .setInterval(10000)
+                    .setFastestInterval(5000)
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            mFusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback(), null);
+        } catch (SecurityException e){
+            Log.d(TAG, "SecurityException - " + e.getMessage());
+        }
+    }
+
+    private void startGeofenceMonitoring() {
+        try{
+            //BUILDING A GEOFENCE
+            Geofence geofence = new Geofence.Builder()
+                    .setRequestId(GEOFENCE_ID)
+                    .setCircularRegion(LIBRARY_LAT, LIBRARY_LONG, LIBRARY_RADIUS)
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setNotificationResponsiveness(1000)//in milliseconds
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .build();
+            GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
+                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                    .addGeofence(geofence).build();
+            Intent intent = new Intent(this, GeofenceService.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            if(!apiClient.isConnected()){
+                Log.d(TAG, "GoogleApiClient Is not connected");
+            } else {
+                mGeofencingClient.addGeofences(geofenceRequest, pendingIntent);
+            }
+        } catch (SecurityException e){
+            Log.d(TAG, "SecurityException - " + e.getMessage());
+        }
+    }
+
+    private void stopGeofenceMonitoring(){
+        Log.d(TAG, "stopMonitoring called");
+        ArrayList<String> geofenceIds = new ArrayList<String>();
+        geofenceIds.add(GEOFENCE_ID);
+        mGeofencingClient.removeGeofences(geofenceIds);
+    }
+
 }
