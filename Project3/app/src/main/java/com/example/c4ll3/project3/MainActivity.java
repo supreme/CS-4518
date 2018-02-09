@@ -131,28 +131,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         super.onResume();
-           mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        startLocationMonitoring();
+        startGeofenceMonitoring();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-           mSensorManager.unregisterListener(this);
-
+        mSensorManager.unregisterListener(this);
+        stopGeofenceMonitoring();
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (inFullerGeofence){
+            Log.d(TAG, "In fuller geofence");
             stepCount++;
             if (stepCount == STEP_COUNT_IN_GEOFENCE){
+                fuller_counter++;
                 fuller_visits.setText(getString(R.string.visits_to_fuller_labs_geofence, fuller_counter));
                 Toast.makeText(this, "You have taken 6 steps inside Fuller Labs Geofence, incrementing counter", Toast.LENGTH_SHORT).show();
             }
         }
-        else if (inLibraryGeofence){
+        else if (inLibraryGeofence) {
+            Log.d(TAG, "In library geofence");
             stepCount++;
             if (stepCount == STEP_COUNT_IN_GEOFENCE){
+                library_counter++;
                 library_visits.setText(getString(R.string.visits_to_library_geofence, library_counter));
                 Toast.makeText(this, "You have taken 6 steps inside the Gordon Library Geofence, incrementing counter", Toast.LENGTH_SHORT).show();
             }
@@ -256,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     /**
      * Initialize Google Play Services API client.
      */
-    private void initGooglePlayServices() {
+    private synchronized void initGooglePlayServices() {
         apiClient = new GoogleApiClient.Builder(this)
                 .addApi(ActivityRecognition.API)
                 .addConnectionCallbacks(this)
@@ -269,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public boolean handleMessage(Message msg) {
                 String activity = msg.getData().getString(Constants.ACTIVITY_MESSAGE_TAG);
+                int timeSpent = msg.getData().getInt(Constants.ACTIVITY_DURATION_TAG);
                 text_activity.setText(getString(R.string.you_are, activity));
 
                 // Set image view based on activity
@@ -278,6 +285,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     activity_image.setImageDrawable(getResources().getDrawable(R.drawable.walking));
                 } else if (activity.equals(getString(R.string.activity_running))) {
                     activity_image.setImageDrawable(getResources().getDrawable(R.drawable.running));
+                }
+
+                if (timeSpent > 0) {
+                    Toast.makeText(getApplicationContext(),
+                            "You were " + activity + " for " + timeSpent + " seconds",
+                            Toast.LENGTH_LONG).show();
                 }
 
                 return false;
@@ -292,6 +305,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         ActivityRecognitionClient activityRecognitionClient = ActivityRecognition.getClient(getApplicationContext());
         activityRecognitionClient.requestActivityUpdates(Constants.ACTIVITY_CHECK_DELAY, pendingIntent);
+
+        startLocationMonitoring();
+        startGeofenceMonitoring();
+        Log.d(TAG, "onConnected() api client connected: " + apiClient.isConnected());
     }
 
     @Override
@@ -304,8 +321,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void startLocationMonitoring(){
+    private void startLocationMonitoring() {
         Log.d(TAG, "startLocation called");
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
             LocationRequest locationRequest = LocationRequest.create()
                     .setInterval(10000)
@@ -318,6 +336,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void startGeofenceMonitoring() {
+        mGeofencingClient = LocationServices.getGeofencingClient(this);
+        Log.d(TAG, "" + Constants.LANDMARKS.size());
         try{
             List<Geofence> geofenceList = new ArrayList<>();
             for(String k : Constants.LANDMARKS.keySet()){
@@ -329,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                         .build();
                 geofenceList.add(tempGeo);
+                Log.d(TAG, "Created Geofence" + Constants.LANDMARKS.get(k).geofenceID);
             }
             //BUILDING A GEOFENCE
 //            Geofence libraryGeofence = new Geofence.Builder()

@@ -44,7 +44,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="AIzaSyBkV42_1lXDSco4SN_ZvsJBOhAA9Q7IpK0" />
         <service android:name=".ActivityRecognizedService" />
 
         <service android:name=".GeofenceService" android:exported="true" android:enabled="true"/>
