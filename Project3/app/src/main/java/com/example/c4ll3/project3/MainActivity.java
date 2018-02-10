@@ -60,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // Google Play Services API client
     private GoogleApiClient apiClient;
+
+    // Activity monitoring and messaging
+    private ActivityMonitor activityMonitor;
     private Handler activityHandler;
 
     private TextView fuller_visits;
@@ -270,27 +273,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
         apiClient.connect();
 
-        // Callback handler for activity recognition service
-        activityHandler = new Handler(new Handler.Callback() {
+        activityMonitor = new ActivityMonitor();
+        activityHandler = new Handler(new Handler.Callback() {  // Callback handler for activity recognition service
             @Override
             public boolean handleMessage(Message msg) {
                 String activity = msg.getData().getString(Constants.ACTIVITY_MESSAGE_TAG);
-                int timeSpent = msg.getData().getInt(Constants.ACTIVITY_DURATION_TAG);
-                text_activity.setText(getString(R.string.you_are, activity));
 
-                // Set image view based on activity
-                if (activity.equals(getString(R.string.activity_still))) {
-                    activity_image.setImageDrawable(getResources().getDrawable(R.drawable.still));
-                } else if (activity.equals(getString(R.string.activity_walking))) {
-                    activity_image.setImageDrawable(getResources().getDrawable(R.drawable.walking));
-                } else if (activity.equals(getString(R.string.activity_running))) {
-                    activity_image.setImageDrawable(getResources().getDrawable(R.drawable.running));
-                }
+                if (activityMonitor.needsUpdate(activity)) {
+                    int timeSpent = activityMonitor.getActivityDuration();
+                    text_activity.setText(getString(R.string.you_are, activityMonitor.getCurrentActivity()));
 
-                if (timeSpent > 0) {
-                    Toast.makeText(getApplicationContext(),
-                            "You were " + activity + " for " + timeSpent + " seconds",
-                            Toast.LENGTH_LONG).show();
+                    // Set image view based on activity
+                    if (activity.equals(getString(R.string.activity_still))) {
+                        activity_image.setImageDrawable(getResources().getDrawable(R.drawable.still));
+                    } else if (activity.equals(getString(R.string.activity_walking))) {
+                        activity_image.setImageDrawable(getResources().getDrawable(R.drawable.walking));
+                    } else if (activity.equals(getString(R.string.activity_running))) {
+                        activity_image.setImageDrawable(getResources().getDrawable(R.drawable.running));
+                    }
+
+                    if (timeSpent > 0) {
+                        Toast.makeText(getApplicationContext(),
+                                "You were " + activityMonitor.getPreviousActivity() + " for " + timeSpent + " seconds",
+                                Toast.LENGTH_LONG).show();
+                    }
                 }
 
                 return false;

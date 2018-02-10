@@ -31,34 +31,10 @@ public class ActivityRecognizedService extends IntentService {
     private Messenger messenger;
 
     /**
-     * The current activity a user is performing.
-     */
-    private String currentActivity;
-
-    /**
-     * The previous activity the user was performing.
-     */
-    private String previousActivity;
-
-    /**
-     * The start time of an activity.
-     */
-    private long startTime;
-
-    /**
-     * The end time of an activity.
-     */
-    private long endTime;
-
-    /**
      * Default constructor for AndroidManifest.xml.
      */
     public ActivityRecognizedService() {
         super("ActivityRecognizedService");
-        currentActivity = null;
-        previousActivity = null;
-        startTime = 0;
-        endTime = 0;
     }
 
     /**
@@ -68,10 +44,6 @@ public class ActivityRecognizedService extends IntentService {
      */
     public ActivityRecognizedService(String name) {
         super(name);
-        currentActivity = null;
-        previousActivity = null;
-        startTime = 0;
-        endTime = 0;
     }
 
     @Override
@@ -89,34 +61,10 @@ public class ActivityRecognizedService extends IntentService {
                 return;
             }
 
-            // Set current activity first time
-            if (currentActivity == null) {
-                currentActivity = "Still";
-                startTime = System.currentTimeMillis();
-            }
-
-            // Only send update when activity changes
-            if (currentActivity.equals(activity)) {
-                Log.d("steve", "Current activity: " + currentActivity + " activity: " + activity);
-                return;
-            } else {
-                previousActivity = currentActivity;
-                currentActivity = activity;
-                endTime = System.currentTimeMillis();
-            }
-
-            // Get time spent in activity
-            Log.d("steve", "Start time: " + startTime + " End time: " + endTime);
-            int timeSpent = ((int) (endTime - startTime))/1000;
-            startTime = System.currentTimeMillis();
-
-
             // Send message to main activity with activity
             Message message = Message.obtain();
             Bundle data = new Bundle();
-            data.putString(Constants.ACTIVITY_MESSAGE_TAG, currentActivity);
-            data.putString(Constants.ACTIVITY_PREVIOUS_TAG, previousActivity);
-            data.putInt(Constants.ACTIVITY_DURATION_TAG, timeSpent);
+            data.putString(Constants.ACTIVITY_MESSAGE_TAG, activity);
             message.setData(data);
 
             try {
