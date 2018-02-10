@@ -3,10 +3,8 @@ package com.example.c4ll3.project3;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
-import android.app.usage.ConfigurationStats;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,7 +15,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.annotation.NonNull;
@@ -29,12 +26,9 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Looper;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -92,11 +86,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static boolean inFullerGeofence = false;
     public static boolean inLibraryGeofence = false;
 
-
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GeofencingClient mGeofencingClient;
-
-    public static boolean inGeofence = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -357,27 +348,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 geofenceList.add(tempGeo);
                 Log.d(TAG, "Created Geofence" + Constants.LANDMARKS.get(k).geofenceID);
             }
-            //BUILDING A GEOFENCE
-//            Geofence libraryGeofence = new Geofence.Builder()
-//                    .setRequestId(Constants.LANDMARKS.get("Library").geofenceID)
-//                    .setCircularRegion(Constants.LANDMARKS.get("Library").latitude, Constants.LANDMARKS.get("Library").longitude, Constants.LANDMARKS.get("Library").radius)
-//                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-//                    .setNotificationResponsiveness(1000)//in milliseconds
-//                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-//                    .build();
-//            Geofence fullerGeofence = new Geofence.Builder()
-//                    .setRequestId(Constants.LANDMARKS.get("FullerLabs").geofenceID)
-//                    .setCircularRegion(Constants.LANDMARKS.get("FullerLabs").latitude, Constants.LANDMARKS.get("FullerLabs").longitude, Constants.LANDMARKS.get("FullerLabs").radius)
-//                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-//                    .setNotificationResponsiveness(1000)//in milliseconds
-//                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-//                    .build();
 
             GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
                     .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
                     .addGeofences(geofenceList)
-//                    .addGeofence(libraryGeofence)
-//                    .addGeofence(fullerGeofence)
                     .build();
 
             Intent intent = new Intent(this, GeofenceService.class);

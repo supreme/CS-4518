@@ -1,7 +1,5 @@
 package com.example.c4ll3.project3;
 
-import android.util.Log;
-
 /**
  * Monitors a user's activities.
  * @author Stephen Andrews
@@ -40,7 +38,6 @@ public class ActivityMonitor {
      * @return <boolean></boolean>
      */
     public boolean needsUpdate(String apiResponse) {
-        Log.d("steve", "API RESPOSNE: " + apiResponse + " CURRENT: " + currentActivity);
         if (currentActivity.isEmpty()) { // First update
             currentActivity = apiResponse;
             startTime = System.currentTimeMillis();

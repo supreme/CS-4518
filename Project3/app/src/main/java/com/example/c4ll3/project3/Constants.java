@@ -9,9 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 class Constants {
     static final int ACTIVITY_CHECK_DELAY = 0; // Check for activity as frequently as possible
     static final int ACTIVITY_CONFIDENCE_THRESHOLD = 50;
-    static final String ACTIVITY_DURATION_TAG = "ACTIVITY_DURATION";
     static final String ACTIVITY_MESSAGE_TAG = "ACTIVITY";
-    static final String ACTIVITY_PREVIOUS_TAG = "ACTIVITY_PREVIOUS";
 
     private static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";
 
