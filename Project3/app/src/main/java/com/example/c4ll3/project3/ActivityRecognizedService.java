@@ -7,14 +7,9 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
-import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.List;
 
@@ -51,39 +46,21 @@ public class ActivityRecognizedService extends IntentService {
         Bundle bundle = intent.getExtras();
         messenger = (Messenger) bundle.get("messenger");
 
-        Log.d("steve", "blah: " + intent.getStringExtra("blah"));
         if (ActivityRecognitionResult.hasResult(intent)) {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
-            handleDetectedActivities(result.getProbableActivities());
-        }
-    }
 
-    private void handleDetectedActivities(List<DetectedActivity> probableActivities) {
-        for(DetectedActivity activity : probableActivities) {
-            Bundle data = new Bundle();
-            Message message = Message.obtain();
-
-            // TODO: activity.getConfidence() >= SOME_THRESHOLD
-            switch(activity.getType()) {
-                case DetectedActivity.RUNNING: {
-                    Log.d("steve", "Running: " + activity.getConfidence() );
-                    data.putString("ACTIVITY", "Running");
-                    message.setData(data);
-                    break;
-                }
-                case DetectedActivity.STILL: {
-                    Log.d("steve", "Still: " + activity.getConfidence() );
-                    data.putString("ACTIVITY", "Still");
-                    message.setData(data);
-                    break;
-                }
-                case DetectedActivity.WALKING: {
-                    Log.d("steve", "Walking: " + activity.getConfidence() );
-                    data.putString("ACTIVITY", "Walking");
-                    message.setData(data);
-                    break;
-                }
+            // Get probable activities and filter for still, walking, or running
+            List<DetectedActivity> activities = result.getProbableActivities();
+            String activity = getActivityString(activities);
+            if (activity.equals(getString(R.string.activity_unknown))) {
+                return;
             }
+
+            // Send message to main activity with activity
+            Message message = Message.obtain();
+            Bundle data = new Bundle();
+            data.putString(Constants.ACTIVITY_MESSAGE_TAG, activity);
+            message.setData(data);
 
             try {
                 messenger.send(message);
@@ -91,5 +68,30 @@ public class ActivityRecognizedService extends IntentService {
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Parses a list of {@link DetectedActivity}s to determine the most probable activity
+     * and returns its string representation.
+     * @param activities The activities to consider in order of most probable.
+     * @return A string representation of the most probable activity.
+     */
+    private String getActivityString(List<DetectedActivity> activities) {
+        for (DetectedActivity activity : activities) {
+            if (activity.getConfidence() < Constants.ACTIVITY_CONFIDENCE_THRESHOLD) {
+                continue;
+            }
+
+            switch (activity.getType()) {
+                case DetectedActivity.STILL:
+                    return getString(R.string.activity_still);
+                case DetectedActivity.WALKING:
+                    return getString(R.string.activity_walking);
+                case DetectedActivity.RUNNING:
+                    return getString(R.string.activity_running);
+            }
+        }
+
+        return getString(R.string.activity_unknown);
     }
 }

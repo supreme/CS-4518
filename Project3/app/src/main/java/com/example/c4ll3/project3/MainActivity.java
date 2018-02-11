@@ -3,7 +3,6 @@ package com.example.c4ll3.project3;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
-import android.app.usage.ConfigurationStats;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -16,7 +15,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.support.annotation.NonNull;
@@ -28,12 +26,9 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Looper;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -57,10 +52,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public static final String TAG = "MainActivity";
 
-    private final int ACTIVITY_CHECK_DELAY = 1000; // Check for activity every second
-
     // Google Play Services API client
     private GoogleApiClient apiClient;
+
+    // Activity monitoring and messaging
+    private ActivityMonitor activityMonitor;
     private Handler activityHandler;
 
     private TextView fuller_visits;
@@ -90,11 +86,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static boolean inFullerGeofence = false;
     public static boolean inLibraryGeofence = false;
 
-
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private GeofencingClient mGeofencingClient;
-
-    public static boolean inGeofence = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         // Get UI elements and fill with default values
+        activity_image = findViewById(R.id.acitivty_image);
         fuller_visits = findViewById(R.id.text_fuller);
         library_visits = findViewById(R.id.text_library);
         text_activity = findViewById(R.id.text_activity);
@@ -131,28 +125,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onResume() {
         super.onResume();
-           mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        startLocationMonitoring();
+        startGeofenceMonitoring();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-           mSensorManager.unregisterListener(this);
-
+        mSensorManager.unregisterListener(this);
+        stopGeofenceMonitoring();
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (inFullerGeofence){
+            Log.d(TAG, "In fuller geofence");
             stepCount++;
             if (stepCount == STEP_COUNT_IN_GEOFENCE){
+                fuller_counter++;
                 fuller_visits.setText(getString(R.string.visits_to_fuller_labs_geofence, fuller_counter));
                 Toast.makeText(this, "You have taken 6 steps inside Fuller Labs Geofence, incrementing counter", Toast.LENGTH_SHORT).show();
             }
         }
-        else if (inLibraryGeofence){
+        else if (inLibraryGeofence) {
+            Log.d(TAG, "In library geofence");
             stepCount++;
             if (stepCount == STEP_COUNT_IN_GEOFENCE){
+                library_counter++;
                 library_visits.setText(getString(R.string.visits_to_library_geofence, library_counter));
                 Toast.makeText(this, "You have taken 6 steps inside the Gordon Library Geofence, incrementing counter", Toast.LENGTH_SHORT).show();
             }
@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         if (!isGPSEnabled && !isNetworkEnabled) {
-            Toast.makeText(getApplicationContext(), "Unable to use location services!", Toast.LENGTH_LONG);
+            Toast.makeText(getApplicationContext(), "Unable to use location services!", Toast.LENGTH_LONG).show();
         }
 
         criteria = new Criteria();
@@ -244,7 +244,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Get best provider from available selection
         bestLocationProvider = locationManager.getBestProvider(criteria, true);
-        Log.d("steve", "Best location provider: " + bestLocationProvider);
     }
 
 
@@ -257,21 +256,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     /**
      * Initialize Google Play Services API client.
      */
-    private void initGooglePlayServices() {
+    private synchronized void initGooglePlayServices() {
         apiClient = new GoogleApiClient.Builder(this)
                 .addApi(ActivityRecognition.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
-
         apiClient.connect();
 
-        activityHandler = new Handler(new Handler.Callback() {
+        activityMonitor = new ActivityMonitor();
+        activityHandler = new Handler(new Handler.Callback() {  // Callback handler for activity recognition service
             @Override
             public boolean handleMessage(Message msg) {
-                Bundle reply = msg.getData();
-                text_activity.setText("You are " + reply.getString("ACTIVITY"));
-                Log.d("steve", "GOT REPLY: " + reply.getString("ACTIVITY"));
+                String activity = msg.getData().getString(Constants.ACTIVITY_MESSAGE_TAG);
+
+                if (activityMonitor.needsUpdate(activity)) {
+                    int timeSpent = activityMonitor.getActivityDuration();
+                    text_activity.setText(getString(R.string.you_are, activityMonitor.getCurrentActivity()));
+
+                    // Set image view based on activity
+                    if (activity.equals(getString(R.string.activity_still))) {
+                        activity_image.setImageDrawable(getResources().getDrawable(R.drawable.still));
+                    } else if (activity.equals(getString(R.string.activity_walking))) {
+                        activity_image.setImageDrawable(getResources().getDrawable(R.drawable.walking));
+                    } else if (activity.equals(getString(R.string.activity_running))) {
+                        activity_image.setImageDrawable(getResources().getDrawable(R.drawable.running));
+                    }
+
+                    if (timeSpent > 0) {
+                        Toast.makeText(getApplicationContext(),
+                                "You were " + activityMonitor.getPreviousActivity() + " for " + timeSpent + " seconds",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+
                 return false;
             }
         });
@@ -283,7 +301,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         intent.putExtra("messenger", new Messenger(activityHandler));
         PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         ActivityRecognitionClient activityRecognitionClient = ActivityRecognition.getClient(getApplicationContext());
-        activityRecognitionClient.requestActivityUpdates(ACTIVITY_CHECK_DELAY, pendingIntent);
+        activityRecognitionClient.requestActivityUpdates(Constants.ACTIVITY_CHECK_DELAY, pendingIntent);
+
+        startLocationMonitoring();
+        startGeofenceMonitoring();
+        Log.d(TAG, "onConnected() api client connected: " + apiClient.isConnected());
     }
 
     @Override
@@ -296,8 +318,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void startLocationMonitoring(){
+    private void startLocationMonitoring() {
         Log.d(TAG, "startLocation called");
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         try {
             LocationRequest locationRequest = LocationRequest.create()
                     .setInterval(10000)
@@ -310,6 +333,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void startGeofenceMonitoring() {
+        mGeofencingClient = LocationServices.getGeofencingClient(this);
+        Log.d(TAG, "" + Constants.LANDMARKS.size());
         try{
             List<Geofence> geofenceList = new ArrayList<>();
             for(String k : Constants.LANDMARKS.keySet()){
@@ -321,28 +346,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                         .build();
                 geofenceList.add(tempGeo);
+                Log.d(TAG, "Created Geofence" + Constants.LANDMARKS.get(k).geofenceID);
             }
-            //BUILDING A GEOFENCE
-//            Geofence libraryGeofence = new Geofence.Builder()
-//                    .setRequestId(Constants.LANDMARKS.get("Library").geofenceID)
-//                    .setCircularRegion(Constants.LANDMARKS.get("Library").latitude, Constants.LANDMARKS.get("Library").longitude, Constants.LANDMARKS.get("Library").radius)
-//                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-//                    .setNotificationResponsiveness(1000)//in milliseconds
-//                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-//                    .build();
-//            Geofence fullerGeofence = new Geofence.Builder()
-//                    .setRequestId(Constants.LANDMARKS.get("FullerLabs").geofenceID)
-//                    .setCircularRegion(Constants.LANDMARKS.get("FullerLabs").latitude, Constants.LANDMARKS.get("FullerLabs").longitude, Constants.LANDMARKS.get("FullerLabs").radius)
-//                    .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-//                    .setNotificationResponsiveness(1000)//in milliseconds
-//                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-//                    .build();
 
             GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
                     .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
                     .addGeofences(geofenceList)
-//                    .addGeofence(libraryGeofence)
-//                    .addGeofence(fullerGeofence)
                     .build();
 
             Intent intent = new Intent(this, GeofenceService.class);

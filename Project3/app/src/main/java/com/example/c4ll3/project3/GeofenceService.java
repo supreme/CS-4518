@@ -39,7 +39,7 @@ public class GeofenceService extends IntentService {
                 } else if (transition == Geofence.GEOFENCE_TRANSITION_EXIT) {
                     Log.d(TAG, "Exiting geofence - " + requestId);
                     MainActivity.stepCount = 0;
-                    if(requestId.equals("Library Geofence"))
+                    if(requestId.equals("LibraryGeofence"))
                         MainActivity.inLibraryGeofence = false;
                     else if(requestId.equals("FullerGeofence"))
                         MainActivity.inFullerGeofence = false;
