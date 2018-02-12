@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="cs4518_team6.wpireads.LoginActivity">
+    tools:context="cs4518_team6.booksmart.LoginActivity">
 
     <!-- Login progress -->
     <ProgressBar

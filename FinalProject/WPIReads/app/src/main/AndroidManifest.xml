@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cs4518_team6.wpireads">
+    package="cs4518_team6.booksmart">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginActivity"
+            android:name="cs4518_team6.booksmart.LoginActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,10 +23,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".AddBookActivity" />
-        <activity android:name=".SearchActivity"></activity>
+        <activity android:name="cs4518_team6.booksmart.MainActivity" />
+        <activity android:name="cs4518_team6.booksmart.ProfileActivity" />
+        <activity android:name="cs4518_team6.booksmart.AddBookActivity" />
+        <activity android:name="cs4518_team6.booksmart.SearchActivity"></activity>
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package cs4518_team6.wpireads;
+package cs4518_team6.booksmart;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
