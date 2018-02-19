@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="cs4518_team6.booksmart.LoginActivity"
+            android:name=".LoginActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,10 +23,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="cs4518_team6.booksmart.MainActivity" />
-        <activity android:name="cs4518_team6.booksmart.ProfileActivity" />
-        <activity android:name="cs4518_team6.booksmart.AddBookActivity" />
-        <activity android:name="cs4518_team6.booksmart.SearchActivity"></activity>
+        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".AddBookActivity"
+            android:label="AddBookActivity"
+            android:theme="@style/AppTheme.NoTitleBar" />
+        <activity android:name=".SearchActivity" />
+        <activity
+            android:name=".ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
