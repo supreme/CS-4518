@@ -13,19 +13,44 @@ from book_smart.models import Author, Book
 from book_smart.extensions import db
 
 
-book = Blueprint('book', __name__)
+book_view = Blueprint('book', __name__)
 
-@book.route('/', methods=['GET'])
-@book.route('/<isbn>', methods=['GET'])
+@book_view.route('/', methods=['GET'])
+@book_view.route('/<isbn>', methods=['GET'])
 def get(isbn=None):
     """Get a book's information by its ISBN-10 identifier."""
 
     if isbn:
-        return jsonify(get_book(isbn))
+        return jsonify(get_book_data(isbn))
 
     return jsonify([b.to_json() for b in Book.query.all()])
 
 def get_book(isbn):
+    """
+    Returns a book model with its respective authors for a given isbn.
+
+    :param isbm: The isbn of the book to get.
+    :return: A book model with its authors.
+    """
+
+    book = Book.query.filter_by(isbn=isbn).first()
+    if book:
+        return book
+
+    book_data = get_book_data(isbn)
+    author_data = book_data.pop('authors')
+
+    book = Book(**book_data)
+    for author in author_data:
+        first, last = author.split(' ')
+        if Author.query.filter_by(first_name=first, last_name=last).first():
+            continue
+
+        book.authors.append(Author(first_name=first, last_name=last))
+
+    return book
+
+def get_book_data(isbn):
     """
     Get the book data for a given ISBN from the Google books API.
 
@@ -41,10 +66,11 @@ def get_book(isbn):
         'title': data['volumeInfo']['title'],
         'subtitle': data['volumeInfo']['subtitle'],
         'authors': data['volumeInfo']['authors'],
+        'isbn': isbn,
         'publisher': data['volumeInfo']['publisher'],
-        'publishedDate': data['volumeInfo']['publishedDate'],
+        'published_date': data['volumeInfo']['publishedDate'],
         'description': data['volumeInfo']['description'],
-        'smallThumbnail': data['volumeInfo']['imageLinks']['smallThumbnail'],
+        'small_thumbnail': data['volumeInfo']['imageLinks']['smallThumbnail'],
         'thumbnail': data['volumeInfo']['imageLinks']['thumbnail']
     }
 

@@ -20,16 +20,20 @@ class Book(db.Model):
     publisher = db.Column(db.Text, nullable=False)
     published_date = db.Column(db.Integer, nullable=False)
     title = db.Column(db.Text, nullable=False)
+    thumbnail = db.Column(db.Text, nullable=False)
+    small_thumbnail = db.Column(db.Text, nullable=False)
     subtitle = db.Column(db.Text, nullable=False)
 
     def to_json(self):
         book = {}
         book['isbn'] = self.isbn
-        book['authors'] = self.authors
+        book['authors'] = [author.to_json() for author in self.authors]
         book['description'] = self.description
         book['publisher'] = self.publisher
         book['published_date'] = self.published_date
         book['title'] = self.title
+        book['thumbnail'] = self.thumbnail
+        book['small_thumbnail'] = self.small_thumbnail
         book['subtitle'] = self.subtitle
 
         return book

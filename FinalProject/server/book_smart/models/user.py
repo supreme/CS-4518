@@ -33,5 +33,7 @@ class User(db.Model):
         user['username'] = self.username
         user['first_name'] = self.first_name
         user['last_name'] = self.last_name
+        user['owned'] = [book.to_json() for book in self.owned_list]
+        user['wanted'] = [book.to_json() for book in self.wanted_list]
 
         return user

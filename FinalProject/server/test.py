@@ -23,9 +23,6 @@ class TestAPI(unittest.TestCase):
                                        'lastName': 'Andrews'})
         assert response.status_code == 409
 
-    def test_user_creation(self):
-        self.user_creation_ok()
-        self.user_creation_fail()
 
     def user_login_ok(self):
         response = requests.post(API.format(endpoint='/users/login'),
@@ -39,8 +36,29 @@ class TestAPI(unittest.TestCase):
                                        'password': 'test1'})
         assert response.status_code == 401
 
-    def test_user_login(self):
+    def user_add_owned(self):
+        """Adds a owned book to the user's profile."""
+
+        response = requests.post(API.format(endpoint='/users/owned'),
+                                 data={'username': 'steve',
+                                       'isbn': '0321804333'})
+        assert response.status_code == 200
+
+    def user_add_wanted(self):
+        """Adds a wanted book to the user's profile."""
+
+        response = requests.post(API.format(endpoint='/users/wanted'),
+                                 data={'username': 'steve',
+                                       'isbn': '0321804333'})
+        assert response.status_code == 200
+
+    def test_all(self):
+        self.user_creation_ok()
+        self.user_creation_fail()
         self.user_login_ok()
+        self.user_login_fail()
+        self.user_add_owned()
+        self.user_add_wanted()
 
 
 if __name__ == '__main__':
