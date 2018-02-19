@@ -1,9 +1,13 @@
 package cs4518_team6.booksmart;
 
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 
 public class AddBookActivity extends AppCompatActivity {
@@ -16,7 +20,7 @@ public class AddBookActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_book);
 
-        Button mAddBook = findViewById(R.id.add_book);
+        mAddBook = findViewById(R.id.add_book);
         mAddBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -26,7 +30,7 @@ public class AddBookActivity extends AppCompatActivity {
             }
         });
 
-        Button mCancel = findViewById(R.id.cancel);
+        mCancel = findViewById(R.id.cancel);
         mCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
