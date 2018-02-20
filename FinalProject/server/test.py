@@ -38,7 +38,6 @@ class TestAPI(unittest.TestCase):
 
     def user_add_owned(self):
         """Adds a owned book to the user's profile."""
-
         response = requests.post(API.format(endpoint='/users/owned'),
                                  data={'username': 'steve',
                                        'isbn': '0321804333'})
@@ -46,19 +45,29 @@ class TestAPI(unittest.TestCase):
 
     def user_add_wanted(self):
         """Adds a wanted book to the user's profile."""
-
         response = requests.post(API.format(endpoint='/users/wanted'),
                                  data={'username': 'steve',
                                        'isbn': '0321804333'})
         assert response.status_code == 200
 
+    def add_listing(self):
+        """Add a listing."""
+        response = requests.post(API.format(endpoint='/listings/add'),
+                                 data={'username': 'steve',
+                                       'isbn': '0321804333',
+                                       'listing_type': 'sale',
+                                       'condition': 'excellent'})
+        assert response.status_code == 200
+
+
     def test_all(self):
-        self.user_creation_ok()
+        #self.user_creation_ok()
         self.user_creation_fail()
         self.user_login_ok()
         self.user_login_fail()
         self.user_add_owned()
         self.user_add_wanted()
+        self.add_listing()
 
 
 if __name__ == '__main__':
