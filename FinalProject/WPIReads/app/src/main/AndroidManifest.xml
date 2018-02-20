@@ -23,12 +23,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
         <activity
             android:name=".AddBookActivity"
             android:label="AddBookActivity"
             android:theme="@style/AppTheme.NoTitleBar" />
-        <activity android:name=".SearchActivity" />
+        <activity
+            android:name=".SearchActivity"
+            android:label="Search"
+            android:parentActivityName=".ProfileActivity" />
         <activity
             android:name=".ProfileActivity"
             android:label="@string/title_activity_profile"
