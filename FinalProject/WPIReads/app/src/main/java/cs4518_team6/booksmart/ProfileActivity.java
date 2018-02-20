@@ -11,14 +11,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class ProfileActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ImageButton mAddWantedBook;
+    private ListView mWantedBookList;
+    private static ArrayList<String> wantedArray;
+    private static ProfileWantedBookAdapter wantedAdapter;
     private ImageButton mAddOwnedBook;
+    private ListView mOwnedBookList;
+    private static ArrayList<String> ownedArray;
+    private static ArrayAdapter<String> ownedAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +62,18 @@ public class ProfileActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 //TODO: Open dialogue to have user enter information for a book they want
+                // Include trade and/or buy+price
+                //addWantedBook();
             }
         });
+
+        mWantedBookList = findViewById(R.id.wanted_book_list);
+        wantedArray = new ArrayList<String>();
+        wantedAdapter = new ProfileWantedBookAdapter(getApplicationContext(), wantedArray);
+        mWantedBookList.setAdapter(wantedAdapter);
+
+        wantedArray.add("Example 1");
+        wantedArray.add("Example 2");
 
         mAddOwnedBook = findViewById(R.id.add_owned_book);
         mAddOwnedBook.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +83,16 @@ public class ProfileActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
+
+        mOwnedBookList = findViewById(R.id.owned_book_list);
+        ownedArray = new ArrayList<String>();
+        ownedAdapter = new ProfileOwnedBookAdapter(getApplicationContext(), ownedArray);
+        mOwnedBookList.setAdapter(ownedAdapter);
+
+        ownedArray.add("Example 3");
+        ownedArray.add("Example 4");
+
+        populateLists();
     }
 
     @Override
@@ -112,5 +143,46 @@ public class ProfileActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void populateLists(){
+        //TODO: Add book titles from database to wantedArray and ownedArray
+        wantedAdapter.notifyDataSetChanged();
+        ownedAdapter.notifyDataSetChanged();
+    }
+
+    public void addWantedBook(String title){
+        if (wantedArray.contains(title)){
+            Toast.makeText(getApplicationContext(), "Book is already in your wanted list", Toast.LENGTH_SHORT);
+        }
+        else {
+            wantedArray.add(title);
+            Collections.sort(wantedArray);
+            wantedAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public static void removeWantedBook(String title){
+        //TODO: Remove from backend database
+        wantedArray.remove(title);
+        wantedAdapter.notifyDataSetChanged();
+    }
+
+    public void addOwnedBook(String title){
+        if (wantedArray.contains(title)){
+            Toast.makeText(getApplicationContext(), "Book is already in your wanted list", Toast.LENGTH_SHORT);
+        }
+        else {
+            //TODO: Add to backend database
+            wantedArray.add(title);
+            Collections.sort(wantedArray);
+            wantedAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public static void removeOwnedBook(String title){
+        //TODO: Remove from backend database
+        ownedArray.remove(title);
+        ownedAdapter.notifyDataSetChanged();
     }
 }
