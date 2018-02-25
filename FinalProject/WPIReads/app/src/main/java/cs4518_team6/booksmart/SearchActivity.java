@@ -47,14 +47,14 @@ public class SearchActivity extends AppCompatActivity {
 
         mBuyList = findViewById(R.id.buy_list);
         buyArray = new ArrayList<String>();
-        buyAdapter = new SearchBookAdapter(SearchActivity.this, buyArray, "BUY", false);
+        buyAdapter = new SearchBookAdapter(SearchActivity.this, buyArray, "BUY");
         mBuyList.setAdapter(buyAdapter);
         buyArray.add("Example 1");
         buyArray.add("Example 2");
 
         mSellList = findViewById(R.id.sell_list);
         sellArray = new ArrayList<String>();
-        sellAdapter = new SearchBookAdapter(SearchActivity.this, sellArray, "SELL", false);
+        sellAdapter = new SearchBookAdapter(SearchActivity.this, sellArray, "SELL");
         mSellList.setAdapter(sellAdapter);
         sellArray.add("Example 3");
         sellArray.add("Example 4");

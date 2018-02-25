@@ -34,7 +34,7 @@ public class ProfileActivity extends AppCompatActivity
     private static ProfileWantedBookAdapter wantedAdapter;
     private ImageButton mAddOwnedBook;
     private ListView mOwnedBookList;
-    private static ArrayList<String> ownedArray;
+    public static ArrayList<String> ownedArray;
     private static ArrayAdapter<String> ownedAdapter;
 
     @Override
@@ -78,12 +78,15 @@ public class ProfileActivity extends AppCompatActivity
         });
 
         mWantedBookList = findViewById(R.id.wanted_book_list);
-        wantedArray = new ArrayList<String>();
+        if (wantedArray == null) {
+            wantedArray = new ArrayList<String>();
+            wantedArray.add("Example 1");
+            wantedArray.add("Example 2");
+        }
         wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, wantedArray);
         mWantedBookList.setAdapter(wantedAdapter);
 
-        addWantedBook("Example 1");
-        addWantedBook("Example 2");
+
 
         mAddOwnedBook = findViewById(R.id.add_owned_book);
         mAddOwnedBook.setOnClickListener(new View.OnClickListener() {
@@ -95,14 +98,17 @@ public class ProfileActivity extends AppCompatActivity
         });
 
         mOwnedBookList = findViewById(R.id.owned_book_list);
-        ownedArray = new ArrayList<String>();
+        if (ownedArray == null) {
+            ownedArray = new ArrayList<String>();
+            ownedArray.add("Example 3");
+            ownedArray.add("Example 4");
+        }
+
         ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, ownedArray);
         mOwnedBookList.setAdapter(ownedAdapter);
 
-        addOwnedBook("Example 3");
-        addOwnedBook("Example 4");
-
         populateLists();
+        System.out.println(ownedArray);
     }
 
     @Override
@@ -163,7 +169,7 @@ public class ProfileActivity extends AppCompatActivity
 
     public void addWantedBook(String title){
         if (wantedArray.contains(title)){
-            Toast.makeText(getApplicationContext(), "Book is already in your wanted list", Toast.LENGTH_SHORT);
+            Toast.makeText(getApplicationContext(), "Book is already in your wanted list", Toast.LENGTH_SHORT).show();
         }
         else {
             wantedArray.add(title);
@@ -177,15 +183,10 @@ public class ProfileActivity extends AppCompatActivity
         wantedAdapter.notifyDataSetChanged();
     }
 
-    public void addOwnedBook(String title){
-        if (ownedArray.contains(title)){
-            Toast.makeText(getApplicationContext(), "Book is already in your wanted list", Toast.LENGTH_SHORT);
-        }
-        else {
-            //TODO: Add to backend database
-            ownedArray.add(title);
-            ownedAdapter.notifyDataSetChanged();
-        }
+    public static void addOwnedBook(String title){
+        //TODO: Add to backend database
+        ownedArray.add(title);
+        ownedAdapter.notifyDataSetChanged();
     }
 
     public static void removeOwnedBook(String title){

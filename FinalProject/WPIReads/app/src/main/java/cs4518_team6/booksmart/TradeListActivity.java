@@ -20,7 +20,7 @@ public class TradeListActivity extends AppCompatActivity {
         ListView tradeList = findViewById(R.id.trade_list);
         ArrayList<String> bookArray = new ArrayList<String>();
         SearchBookAdapter adapter = new SearchBookAdapter(TradeListActivity.this, bookArray,
-                getIntent().getStringExtra("TYPE_FLAG"), true);
+                getIntent().getStringExtra("TYPE_FLAG"), getIntent().getStringExtra("TRADE_BOOK"));
         tradeList.setAdapter(adapter);
         bookArray.add("Example 1");
 

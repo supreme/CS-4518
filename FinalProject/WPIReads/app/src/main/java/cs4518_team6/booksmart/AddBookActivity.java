@@ -76,14 +76,6 @@ public class AddBookActivity extends AppCompatActivity {
         //TODO: If either of these are checked, add to database so we can populate search
 
         mAddBook = findViewById(R.id.add_book);
-        mAddBook.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO: Add new book to backend
-                Intent intent = new Intent(AddBookActivity.this, ProfileActivity.class);
-                startActivity(intent);
-            }
-        });
 
         mCancel = findViewById(R.id.cancel);
         mCancel.setOnClickListener(new View.OnClickListener() {
@@ -103,6 +95,22 @@ public class AddBookActivity extends AppCompatActivity {
                 R.array.condition_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCondition.setAdapter(adapter);
+
+        mAddBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println(mTitle.getText().toString());
+                if (ProfileActivity.ownedArray.contains(mTitle.getText().toString())){
+                    Toast.makeText(AddBookActivity.this, "Book is already in your wanted list", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    //TODO: Add new book to backend
+                    ProfileActivity.ownedArray.add(mTitle.getText().toString());
+                    Intent intent = new Intent(AddBookActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     @Override
