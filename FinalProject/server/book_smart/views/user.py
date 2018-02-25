@@ -91,4 +91,4 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({'status': 'ok', 'message': 'Successfully registered {}'.format(username)}), 200
+    return jsonify({'status': 'ok', 'message': 'Successfully registered {}'.format(username)}), 201

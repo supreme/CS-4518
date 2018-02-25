@@ -23,6 +23,19 @@
     <string name="isbn">ISBN</string>
     <string name="title_activity_settings">Settings</string>
 
+    <!-- Strings for adding a book -->
+
+    <string name="check_box_sale_text">Available for Sale</string>
+    <string name="dollar_sign">$</string>
+    <string name="check_box_trade_text">Available for Trade</string>
+    <string name="book_gallery_imgbtn_description">The button brings up a gallery of images for the book</string>
+    <string name="camera_button_description">This button brings up the camera to take a picture of the book</string>
+
+
+    <!-- Strings for searching a book -->
+
+    <string name="search_button_description">This button will search for the specified book when clicked</string>
+
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->

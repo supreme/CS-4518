@@ -21,6 +21,7 @@
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:contentDescription="@string/book_gallery_imgbtn_description"
                 app:srcCompat="@android:drawable/gallery_thumb" />
 
             <ImageButton
@@ -28,6 +29,7 @@
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:contentDescription="@string/camera_button_description"
                 app:srcCompat="@android:drawable/ic_menu_camera" />
 
 
@@ -115,14 +117,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".75"
-                    android:text="Available for Sale" />
+                    android:text="@string/check_box_sale_text" />
 
                 <TextView
                     android:id="@+id/sale_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight=".02"
-                    android:text="$" />
+                    android:text="@string/dollar_sign" />
 
                 <EditText
                     android:id="@+id/sale_price"
@@ -138,7 +140,7 @@
                 android:id="@+id/check_box_trade"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Available for Trade" />
+                android:text="@string/check_box_trade_text" />
 
             <LinearLayout
                 android:layout_width="match_parent"

@@ -38,6 +38,7 @@
                 android:layout_height="50dp"
                 android:layout_weight=".15"
                 android:background="@null"
+                android:contentDescription="@string/search_button_description"
                 app:srcCompat="@android:drawable/ic_menu_search" />
         </LinearLayout>
 
