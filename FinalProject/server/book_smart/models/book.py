@@ -22,7 +22,7 @@ class Book(db.Model):
     title = db.Column(db.Text, nullable=False)
     thumbnail = db.Column(db.Text, nullable=False)
     small_thumbnail = db.Column(db.Text, nullable=False)
-    subtitle = db.Column(db.Text, nullable=False)
+    subtitle = db.Column(db.Text)
 
     def to_json(self):
         book = {}
@@ -30,10 +30,10 @@ class Book(db.Model):
         book['authors'] = [author.to_json() for author in self.authors]
         book['description'] = self.description
         book['publisher'] = self.publisher
-        book['published_date'] = self.published_date
+        book['publishedDate'] = self.published_date
         book['title'] = self.title
         book['thumbnail'] = self.thumbnail
-        book['small_thumbnail'] = self.small_thumbnail
+        book['smallThumbnail'] = self.small_thumbnail
         book['subtitle'] = self.subtitle
 
         return book

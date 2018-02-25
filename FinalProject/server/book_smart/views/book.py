@@ -64,13 +64,13 @@ def get_book_data(isbn):
 
     book_data = {
         'title': data['volumeInfo']['title'],
-        'subtitle': data['volumeInfo']['subtitle'],
+        'subtitle': data['volumeInfo'].get('subtitle', None),
         'authors': data['volumeInfo']['authors'],
         'isbn': isbn,
         'publisher': data['volumeInfo']['publisher'],
-        'published_date': data['volumeInfo']['publishedDate'],
+        'publishedDate': data['volumeInfo']['publishedDate'],
         'description': data['volumeInfo']['description'],
-        'small_thumbnail': data['volumeInfo']['imageLinks']['smallThumbnail'],
+        'smallThumbnail': data['volumeInfo']['imageLinks']['smallThumbnail'],
         'thumbnail': data['volumeInfo']['imageLinks']['thumbnail']
     }
 
