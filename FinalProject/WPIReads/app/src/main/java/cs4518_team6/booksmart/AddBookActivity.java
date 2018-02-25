@@ -13,11 +13,13 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.Frame;
@@ -37,6 +39,7 @@ public class AddBookActivity extends AppCompatActivity {
     private AutoCompleteTextView mIsbn;
     private AutoCompleteTextView mAuthors;
     private AutoCompleteTextView mTitle;
+    private Spinner mCondition;
     private int numPics;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -52,7 +55,8 @@ public class AddBookActivity extends AppCompatActivity {
         mGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: View gallery
+                Intent intent = new Intent(AddBookActivity.this, BookGalleryActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -93,6 +97,12 @@ public class AddBookActivity extends AppCompatActivity {
         mIsbn = findViewById(R.id.isbn_label);
         mAuthors = findViewById(R.id.authors_label);
         mTitle = findViewById(R.id.title_label);
+        mCondition = findViewById(R.id.condition);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.condition_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mCondition.setAdapter(adapter);
     }
 
     @Override

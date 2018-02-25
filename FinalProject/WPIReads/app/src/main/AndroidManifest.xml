@@ -7,8 +7,9 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <uses-feature android:name="android.hardware.camera"
-                  android:required="true"/>
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -38,6 +39,20 @@
             android:name=".ProfileActivity"
             android:label="@string/title_activity_profile"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".BookReportActivity"
+            android:label=""
+            android:parentActivityName=".SearchActivity" />
+        <activity
+            android:name=".BookGalleryActivity"
+            android:label="" />
+        <activity
+            android:name=".RegistrationActivity"
+            android:label=""
+            android:parentActivityName=".LoginActivity" />
+        <activity android:name=".TradeListActivity"
+            android:label=""
+            android:parentActivityName=".SearchActivity"/>
     </application>
 
 </manifest>

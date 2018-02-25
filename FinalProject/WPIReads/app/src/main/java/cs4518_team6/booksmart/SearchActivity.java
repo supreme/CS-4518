@@ -47,23 +47,25 @@ public class SearchActivity extends AppCompatActivity {
 
         mBuyList = findViewById(R.id.buy_list);
         buyArray = new ArrayList<String>();
-        buyAdapter = new SearchBookAdapter(getApplicationContext(), buyArray);
+        buyAdapter = new SearchBookAdapter(SearchActivity.this, buyArray, "BUY", false);
         mBuyList.setAdapter(buyAdapter);
         buyArray.add("Example 1");
         buyArray.add("Example 2");
 
         mSellList = findViewById(R.id.sell_list);
         sellArray = new ArrayList<String>();
-        sellAdapter = new SearchBookAdapter(getApplicationContext(), sellArray);
+        sellAdapter = new SearchBookAdapter(SearchActivity.this, sellArray, "SELL", false);
         mSellList.setAdapter(sellAdapter);
         sellArray.add("Example 3");
         sellArray.add("Example 4");
+
+        populateLists();
     }
 
     public void populateLists(){
         //TODO: Add book titles from database to buyArray and sellArray
         buyAdapter.notifyDataSetChanged();
-        //sellAdapter.notifyDataSetChanged();
+        sellAdapter.notifyDataSetChanged();
     }
 
     @Override

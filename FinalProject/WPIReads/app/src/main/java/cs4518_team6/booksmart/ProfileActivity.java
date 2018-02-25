@@ -1,7 +1,9 @@
 package cs4518_team6.booksmart;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,9 +14,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,23 +63,27 @@ public class ProfileActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        View header = navigationView.getHeaderView(0);
+        TextView navName = header.findViewById(R.id.nav_name);
+        navName.setText("New Name"); //TODO: Get user's name from db
+        TextView navEmail = header.findViewById(R.id.nav_email_address);
+        navEmail.setText("New Email"); //TODO: Get user's email from db
+
         mAddWantedBook = findViewById(R.id.add_wanted_book);
         mAddWantedBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: Open dialogue to have user enter information for a book they want
-                // Include trade and/or buy+price
-                //addWantedBook();
+                getIsbnFromUser();
             }
         });
 
         mWantedBookList = findViewById(R.id.wanted_book_list);
         wantedArray = new ArrayList<String>();
-        wantedAdapter = new ProfileWantedBookAdapter(getApplicationContext(), wantedArray);
+        wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, wantedArray);
         mWantedBookList.setAdapter(wantedAdapter);
 
-        wantedArray.add("Example 1");
-        wantedArray.add("Example 2");
+        addWantedBook("Example 1");
+        addWantedBook("Example 2");
 
         mAddOwnedBook = findViewById(R.id.add_owned_book);
         mAddOwnedBook.setOnClickListener(new View.OnClickListener() {
@@ -86,11 +96,11 @@ public class ProfileActivity extends AppCompatActivity
 
         mOwnedBookList = findViewById(R.id.owned_book_list);
         ownedArray = new ArrayList<String>();
-        ownedAdapter = new ProfileOwnedBookAdapter(getApplicationContext(), ownedArray);
+        ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, ownedArray);
         mOwnedBookList.setAdapter(ownedAdapter);
 
-        ownedArray.add("Example 3");
-        ownedArray.add("Example 4");
+        addOwnedBook("Example 3");
+        addOwnedBook("Example 4");
 
         populateLists();
     }
@@ -157,7 +167,6 @@ public class ProfileActivity extends AppCompatActivity
         }
         else {
             wantedArray.add(title);
-            Collections.sort(wantedArray);
             wantedAdapter.notifyDataSetChanged();
         }
     }
@@ -169,14 +178,13 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     public void addOwnedBook(String title){
-        if (wantedArray.contains(title)){
+        if (ownedArray.contains(title)){
             Toast.makeText(getApplicationContext(), "Book is already in your wanted list", Toast.LENGTH_SHORT);
         }
         else {
             //TODO: Add to backend database
-            wantedArray.add(title);
-            Collections.sort(wantedArray);
-            wantedAdapter.notifyDataSetChanged();
+            ownedArray.add(title);
+            ownedAdapter.notifyDataSetChanged();
         }
     }
 
@@ -184,5 +192,27 @@ public class ProfileActivity extends AppCompatActivity
         //TODO: Remove from backend database
         ownedArray.remove(title);
         ownedAdapter.notifyDataSetChanged();
+    }
+
+    private void getIsbnFromUser(){
+        final EditText textIsbn = new EditText(this);
+
+        new AlertDialog.Builder(this)
+                .setTitle("New Wanted Book")
+                .setMessage("Enter ISBN")
+                .setView(textIsbn)
+                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String isbn = textIsbn.getText().toString();
+                        //TODO: Use google books API to get title from isbn
+                        String title = isbn;
+                        addWantedBook(title);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                })
+                .show();
     }
 }

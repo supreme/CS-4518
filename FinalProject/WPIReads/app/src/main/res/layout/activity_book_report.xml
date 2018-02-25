@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cs4518_team6.booksmart.BookReportActivity">
+
+    <ScrollView
+        android:id="@+id/book_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/gallery"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:srcCompat="@android:drawable/gallery_thumb" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingTop="25dp"
+                android:paddingLeft="10dp">
+
+                <TextView
+                    android:id="@+id/title_label"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight=".3"
+                    android:textSize="10pt"
+                    android:gravity="center_vertical"
+                    android:text="Title:" />
+
+                <HorizontalScrollView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:layout_weight=".7">
+
+                    <TextView
+                        android:id="@+id/title_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
+                        android:gravity="center_vertical"
+                        android:textSize="10pt"
+                        android:text="This is a very long title that requires scroll" />
+
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingTop="25dp"
+                android:paddingLeft="10dp">
+
+                <TextView
+                    android:id="@+id/isbn_label"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight=".3"
+                    android:textSize="10pt"
+                    android:gravity="center_vertical"
+                    android:text="ISBN:" />
+
+                <HorizontalScrollView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:layout_weight=".7">
+
+                    <TextView
+                        android:id="@+id/isbn_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
+                        android:gravity="center_vertical"
+                        android:textSize="10pt"
+                        android:text="0321804333" />
+
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingTop="25dp"
+                android:paddingLeft="10dp">
+
+                <TextView
+                    android:id="@+id/authors_label"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight=".3"
+                    android:textSize="10pt"
+                    android:gravity="center_vertical"
+                    android:text="Author(s):" />
+
+                <HorizontalScrollView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:layout_weight=".7">
+
+                    <TextView
+                        android:id="@+id/authors_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
+                        android:gravity="center_vertical"
+                        android:textSize="10pt"
+                        android:text="Authors of Book" />
+
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingTop="25dp"
+                android:paddingLeft="10dp">
+
+                <TextView
+                    android:id="@+id/condition_label"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight=".3"
+                    android:textSize="10pt"
+                    android:gravity="center_vertical"
+                    android:text="Condition:" />
+
+                <HorizontalScrollView
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:layout_weight=".7">
+
+                    <TextView
+                        android:id="@+id/condition_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollHorizontally="true"
+                        android:singleLine="true"
+                        android:gravity="center_vertical"
+                        android:textSize="10pt"
+                        android:text="Condition of Book" />
+
+                </HorizontalScrollView>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

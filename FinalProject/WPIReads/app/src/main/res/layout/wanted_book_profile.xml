@@ -24,15 +24,6 @@
     </HorizontalScrollView>
 
     <ImageButton
-        android:id="@+id/edit"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_weight=".1"
-        android:paddingRight="10dp"
-        android:src="@android:drawable/ic_menu_edit"
-        android:background="@null"/>
-
-    <ImageButton
         android:id="@+id/delete"
         style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="0dp"

@@ -31,6 +31,8 @@ public class ProfileOwnedBookAdapter extends ArrayAdapter<String> {
             title.setText(values.get(position));
 
             final String titleString = title.getText().toString();
+            System.out.println(titleString);
+            System.out.println(title.getText());
 
             ImageButton delete = view.findViewById(R.id.delete);
             delete.setOnClickListener(new View.OnClickListener() {
@@ -45,6 +47,7 @@ public class ProfileOwnedBookAdapter extends ArrayAdapter<String> {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent(getContext(), AddBookActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("EXISTING_BOOK", titleString);
                     context.startActivity(intent);
                 }
