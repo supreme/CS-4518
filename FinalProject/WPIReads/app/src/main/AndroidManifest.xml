@@ -53,7 +53,7 @@
             android:label=""
             android:parentActivityName=".LoginActivity" />
         <activity android:name=".TradeListActivity"
-            android:label="User's Wanted Books"
+            android:label=""
             android:parentActivityName=".SearchActivity"/>
     </application>
 

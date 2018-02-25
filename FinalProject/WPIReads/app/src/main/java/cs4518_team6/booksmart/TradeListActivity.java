@@ -16,6 +16,10 @@ public class TradeListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_trade_list);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getIntent().getStringExtra("TYPE_FLAG").equals("BUY"))
+            setTitle("Seller's Wanted Books");
+        if (getIntent().getStringExtra("TYPE_FLAG").equals("SELL"))
+            setTitle("Buyer's Owned Books");
 
         ListView tradeList = findViewById(R.id.trade_list);
         ArrayList<String> bookArray = new ArrayList<String>();

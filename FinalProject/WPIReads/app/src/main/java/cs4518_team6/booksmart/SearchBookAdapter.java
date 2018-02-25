@@ -118,11 +118,15 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
                     Intent intent = new Intent(getContext(), TradeListActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra("TRADE_BOOK", title.getText());
-                    //TODO: intent.putExtra("USER_ID"", [pull user ID from db]) so we can get their list of owned books
-                    if (buy)
+                    //TODO: intent.putExtra("USER_ID"", [pull user ID from db]) so we can get their list of owned/wanted books
+                    if (buy) {
                         intent.putExtra("TYPE_FLAG", "BUY");
-                    else
+                        // User is buying book, so pull up seller's wanted books
+                    }
+                    else {
                         intent.putExtra("TYPE_FLAG", "SELL");
+                        // User is selling book, so pull up buyer's owned books
+                    }
 
                     context.startActivity(intent);
                 }
