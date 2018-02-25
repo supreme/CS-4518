@@ -108,7 +108,6 @@ public class ProfileActivity extends AppCompatActivity
         mOwnedBookList.setAdapter(ownedAdapter);
 
         populateLists();
-        System.out.println(ownedArray);
     }
 
     @Override

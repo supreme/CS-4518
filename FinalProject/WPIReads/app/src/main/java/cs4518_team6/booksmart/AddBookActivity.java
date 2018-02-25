@@ -99,9 +99,8 @@ public class AddBookActivity extends AppCompatActivity {
         mAddBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(mTitle.getText().toString());
                 if (ProfileActivity.ownedArray.contains(mTitle.getText().toString())){
-                    Toast.makeText(AddBookActivity.this, "Book is already in your wanted list", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AddBookActivity.this, "Book is already in your owned list", Toast.LENGTH_SHORT).show();
                 }
                 else {
                     //TODO: Add new book to backend

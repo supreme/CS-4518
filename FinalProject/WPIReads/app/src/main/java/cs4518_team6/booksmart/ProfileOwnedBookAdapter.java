@@ -31,8 +31,6 @@ public class ProfileOwnedBookAdapter extends ArrayAdapter<String> {
             title.setText(values.get(position));
 
             final String titleString = title.getText().toString();
-            System.out.println(titleString);
-            System.out.println(title.getText());
 
             ImageButton delete = view.findViewById(R.id.delete);
             delete.setOnClickListener(new View.OnClickListener() {
