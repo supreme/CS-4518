@@ -42,6 +42,19 @@ public class User extends Model {
     }
 
     /**
+     * Add a {@link Book} to the user's wanted list.
+     * @param isbn The isbn of the book to add.
+     */
+    public void addWanted(String isbn) {
+        String url = Constants.API_URL + ENDPOINT + "wanted";
+        Map<String, String> data = new HashMap<>();
+        data.put("isbn", isbn);
+        data.put("username", username);
+
+        HttpRequest.post(url).form(data);
+    }
+
+    /**
      * Get a user object by a specified username.
      * @param username The username of the user to get.
      * @return The user if it exists, otherwise null.
@@ -84,7 +97,6 @@ public class User extends Model {
      * Attempts to login a user.
      * @param username The username of the user (email).
      * @param password The user's password.
-     * @param context The context the login is being executed from.
      * @return A user object if successful, otherwise null.
      */
     public static User login(String username, String password) {
