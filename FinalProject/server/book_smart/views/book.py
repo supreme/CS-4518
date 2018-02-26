@@ -39,6 +39,8 @@ def get_book(isbn):
 
     book_data = get_book_data(isbn)
     author_data = book_data.pop('authors')
+    book_data['published_date'] = book_data.pop('publishedDate')
+    book_data['small_thumbnail'] = book_data.pop('smallThumbnail')
 
     book = Book(**book_data)
     for author in author_data:

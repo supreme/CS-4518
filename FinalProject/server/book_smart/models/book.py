@@ -27,7 +27,7 @@ class Book(db.Model):
     def to_json(self):
         book = {}
         book['isbn'] = self.isbn
-        book['authors'] = [author.to_json() for author in self.authors]
+        book['authors'] = ['{first_name} {last_name}'.format(**author.to_json()) for author in self.authors]
         book['description'] = self.description
         book['publisher'] = self.publisher
         book['publishedDate'] = self.published_date
