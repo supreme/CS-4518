@@ -2,6 +2,7 @@ package cs4518_team6.booksmart;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +19,26 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
         private ArrayList<String> values;
         private boolean buy = false;
         private boolean trade;
+        private String tradeBook;
 
-        public SearchBookAdapter(Context context, ArrayList<String> values, String typeFlag, boolean trade) {
+        public SearchBookAdapter(Context context, ArrayList<String> values, String typeFlag) {
             super(context, -1, values);
             this.context = context;
             this.values = values;
             if (typeFlag.equals("BUY"))
                 this.buy = true;
-            this.trade = trade;
+            this.trade = false;
+        }
+
+        // This constructor is for trading
+        public SearchBookAdapter(Context context, ArrayList<String> values, String typeFlag, String tradeBook) {
+        super(context, -1, values);
+        this.context = context;
+        this.values = values;
+        if (typeFlag.equals("BUY"))
+            this.buy = true;
+        this.trade = true;
+        this.tradeBook = tradeBook;
         }
 
         @Override
@@ -33,7 +46,7 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.search_book, parent, false);
-            TextView title = view.findViewById(R.id.title);
+            final TextView title = view.findViewById(R.id.title);
             title.setText(values.get(position));
 
             ImageView sale = view.findViewById(R.id.for_sale);
@@ -63,14 +76,27 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
 
             ImageButton message = view.findViewById(R.id.message);
             //TODO: Implement SMS
-            /*message.setOnClickListener(new View.OnClickListener() {
+            message.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent();
+                    String phoneNumber = "9999999999";
+                    String textMessage;
+                    if (buy) {
+                        if (trade)
+                            textMessage = "Hello, I would like to trade my book " + title.getText() + " for your book " + tradeBook + ".\n\nSent via Book Smart";
+                        else
+                        textMessage = "Hello, I would like to buy your book " + title.getText() + ".\n\nSent via Book Smart";
+                    }
+                    else if (trade)
+                        textMessage = "Hello, I would like to trade you my book " + tradeBook + " for your book " + title.getText() + ".\n\nSent via Book Smart";
+                    else
+                        textMessage = "Hello, I would like to sell you my book " + title.getText() + ".\n\nSent via Book Smart";
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + phoneNumber));
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("sms_body", textMessage);
                     context.startActivity(intent);
                 }
-            });*/
+            });
 
             ImageButton tradeButton = view.findViewById(R.id.trade);
 
@@ -91,11 +117,16 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
                 public void onClick(View view) {
                     Intent intent = new Intent(getContext(), TradeListActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    //TODO: intent.putExtra("USER_ID"", [pull user ID from db]) so we can get their list of owned books
-                    if (buy)
+                    intent.putExtra("TRADE_BOOK", title.getText());
+                    //TODO: intent.putExtra("USER_ID"", [pull user ID from db]) so we can get their list of owned/wanted books
+                    if (buy) {
                         intent.putExtra("TYPE_FLAG", "BUY");
-                    else
+                        // User is buying book, so pull up seller's wanted books
+                    }
+                    else {
                         intent.putExtra("TYPE_FLAG", "SELL");
+                        // User is selling book, so pull up buyer's owned books
+                    }
 
                     context.startActivity(intent);
                 }

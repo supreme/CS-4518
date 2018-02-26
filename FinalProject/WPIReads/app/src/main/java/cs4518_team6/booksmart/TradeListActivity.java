@@ -16,11 +16,15 @@ public class TradeListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_trade_list);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getIntent().getStringExtra("TYPE_FLAG").equals("BUY"))
+            setTitle("Seller's Wanted Books");
+        if (getIntent().getStringExtra("TYPE_FLAG").equals("SELL"))
+            setTitle("Buyer's Owned Books");
 
         ListView tradeList = findViewById(R.id.trade_list);
         ArrayList<String> bookArray = new ArrayList<String>();
         SearchBookAdapter adapter = new SearchBookAdapter(TradeListActivity.this, bookArray,
-                getIntent().getStringExtra("TYPE_FLAG"), true);
+                getIntent().getStringExtra("TYPE_FLAG"), getIntent().getStringExtra("TRADE_BOOK"));
         tradeList.setAdapter(adapter);
         bookArray.add("Example 1");
 

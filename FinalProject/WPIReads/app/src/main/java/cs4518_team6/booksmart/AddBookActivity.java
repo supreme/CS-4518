@@ -117,6 +117,21 @@ public class AddBookActivity extends AppCompatActivity {
                 R.array.condition_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCondition.setAdapter(adapter);
+
+        mAddBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ProfileActivity.ownedArray.contains(mTitle.getText().toString())){
+                    Toast.makeText(AddBookActivity.this, "Book is already in your owned list", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    //TODO: Add new book to backend
+                    ProfileActivity.ownedArray.add(mTitle.getText().toString());
+                    Intent intent = new Intent(AddBookActivity.this, ProfileActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     @Override
