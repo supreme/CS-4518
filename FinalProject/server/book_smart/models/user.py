@@ -22,8 +22,8 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Text, unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
-    first_name = db.Column(db.Text, unique=True, nullable=False)
-    last_name = db.Column(db.Text, unique=True, nullable=False)
+    first_name = db.Column(db.Text, nullable=False)
+    last_name = db.Column(db.Text, nullable=False)
     owned_list = db.relationship('Book', secondary=owned_identifier)
     wanted_list = db.relationship('Book', secondary=wanted_identifier)
 
