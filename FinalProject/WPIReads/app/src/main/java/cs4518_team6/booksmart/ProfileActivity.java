@@ -89,8 +89,10 @@ public class ProfileActivity extends AppCompatActivity
         mWantedBookList = findViewById(R.id.wanted_book_list);
         if (wantedArray == null) {
             wantedArray = new ArrayList<String>();
-            wantedArray.add("Example 1");
-            wantedArray.add("Example 2");
+            Book[] wanted = CurrentUser.getInstance().getUser().getWanted();
+            for (Book book : wanted) {
+                wantedArray.add(book.getTitle());
+            }
         }
         wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, wantedArray);
         mWantedBookList.setAdapter(wantedAdapter);
@@ -109,8 +111,10 @@ public class ProfileActivity extends AppCompatActivity
         mOwnedBookList = findViewById(R.id.owned_book_list);
         if (ownedArray == null) {
             ownedArray = new ArrayList<String>();
-            ownedArray.add("Example 3");
-            ownedArray.add("Example 4");
+            Book[] owned = CurrentUser.getInstance().getUser().getOwned();
+            for (Book book : owned) {
+                ownedArray.add(book.getTitle());
+            }
         }
 
         ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, ownedArray);

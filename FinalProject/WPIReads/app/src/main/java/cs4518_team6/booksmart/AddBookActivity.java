@@ -126,6 +126,9 @@ public class AddBookActivity extends AppCompatActivity {
                 }
                 else {
                     //TODO: Add new book to backend
+                    CurrentUser.getInstance().getUser().addOwned(mIsbn.getText().toString());
+
+                    // Update UI and return to previous screen
                     ProfileActivity.ownedArray.add(mTitle.getText().toString());
                     Intent intent = new Intent(AddBookActivity.this, ProfileActivity.class);
                     startActivity(intent);
