@@ -204,6 +204,7 @@ public class ProfileActivity extends AppCompatActivity
 
     private void getIsbnFromUser(){
         final EditText textIsbn = new EditText(this);
+        textIsbn.setInputType(InputType.TYPE_CLASS_TEXT);
 
         new AlertDialog.Builder(this)
                 .setTitle("New Wanted Book")
@@ -213,8 +214,13 @@ public class ProfileActivity extends AppCompatActivity
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String isbn = textIsbn.getText().toString();
                         Book book = Book.get(isbn);
-                        addWantedBook(book.getTitle());
 
+                        if (book != null) {
+                            addWantedBook(book.getTitle());
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "Error finding ISBN: " + isbn, Toast.LENGTH_SHORT).show();
+                        }
                         //TODO: Add book to user accounts wanted list
                         // Currently have no way to get user
                     }

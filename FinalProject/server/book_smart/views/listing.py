@@ -8,7 +8,7 @@ Created by Stephen Andrews, Februrary 20, 2018.
 
 from flask import Blueprint, request, jsonify, url_for
 
-from book_smart.models import Listing, User
+from book_smart.models import Listing, ListingType, User
 from book_smart.extensions import db
 
 
@@ -33,14 +33,21 @@ def add():
     isbn = request.form['isbn']
     condition = request.form['condition']
     price = request.form.get('price', None)
-    listing_type = request.form['listing_type']
+    listing_types = request.form['listingTypes']
 
+    import json
+    print(json.dumps(request.form, indent=4))
     user = User.query.filter_by(username=username).first()
-    if isbn not in [book.isbn for book in user.owned_list]:
-        return jsonify({'status': 'error', 'message': 'User  doesn\'t own book!'}), 401
+    # if isbn not in [book.isbn for book in user.owned_list]:
+    #     return jsonify({'status': 'error', 'message': 'User  doesn\'t own book!'}), 401
 
     listing = Listing(username=username, isbn=isbn, condition=condition,
-                      price=price, listing_type=listing_type)
+                      price=price)
+
+    for listing_type in listing_types:
+        l_type = ListingType.query.filter_by(listing_type_id=listing_type).first()
+        if l_type:
+            listing.listing_types.append(l_type)
 
     db.session.add(listing)
     db.session.commit()
