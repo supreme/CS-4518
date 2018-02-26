@@ -1,5 +1,6 @@
 package cs4518_team6.booksmart;
 
+import android.content.Intent;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -22,6 +24,7 @@ public class SearchActivity extends AppCompatActivity {
     private ListView mSellList;
     private static ArrayList<String> sellArray;
     private static SearchBookAdapter sellAdapter;
+    private ImageButton searchButton;
 
 
     @Override
@@ -49,15 +52,24 @@ public class SearchActivity extends AppCompatActivity {
         buyArray = new ArrayList<String>();
         buyAdapter = new SearchBookAdapter(SearchActivity.this, buyArray, "BUY");
         mBuyList.setAdapter(buyAdapter);
-        buyArray.add("Example 1");
-        buyArray.add("Example 2");
+
 
         mSellList = findViewById(R.id.sell_list);
         sellArray = new ArrayList<String>();
         sellAdapter = new SearchBookAdapter(SearchActivity.this, sellArray, "SELL");
         mSellList.setAdapter(sellAdapter);
-        sellArray.add("Example 3");
-        sellArray.add("Example 4");
+
+
+        searchButton = findViewById(R.id.search);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buyArray.add("Fundamentals of Calculus");
+                buyArray.add("Fundamentals of Calculus");
+                sellArray.add("Fundamentals of Calculus");
+                sellArray.add("Fundamentals of Calculus");
+            }
+        });
 
         populateLists();
     }

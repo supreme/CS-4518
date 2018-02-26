@@ -88,8 +88,7 @@ public class ProfileActivity extends AppCompatActivity
         mWantedBookList = findViewById(R.id.wanted_book_list);
         if (wantedArray == null) {
             wantedArray = new ArrayList<String>();
-            wantedArray.add("Example 1");
-            wantedArray.add("Example 2");
+            wantedArray.add("Fundamentals of Calculus");
         }
         wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, wantedArray);
         mWantedBookList.setAdapter(wantedAdapter);
@@ -108,8 +107,8 @@ public class ProfileActivity extends AppCompatActivity
         mOwnedBookList = findViewById(R.id.owned_book_list);
         if (ownedArray == null) {
             ownedArray = new ArrayList<String>();
-            ownedArray.add("Example 3");
-            ownedArray.add("Example 4");
+            ownedArray.add("Social Science Research");
+            ownedArray.add("Developing Quality Technical Information");
         }
 
         ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, ownedArray);

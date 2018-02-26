@@ -29,6 +29,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import java.util.ArrayList;
 import java.util.List;
 
+import cs4518_team6.booksmart.model.Book;
 import cs4518_team6.booksmart.model.Listing;
 
 public class AddBookActivity extends AppCompatActivity {
@@ -157,6 +158,13 @@ public class AddBookActivity extends AppCompatActivity {
                 if(barcodes.size() == 1){
                     Barcode code = barcodes.valueAt(0);
                     String isbn = code.rawValue;
+
+                    Book book = Book.get(isbn);
+                    mTitle.setText(book.getTitle());
+                    String[] authors = book.getAuthors();
+                    for (String author : authors){
+                        mAuthors.setText(mAuthors.getText() + author + ", ");
+                    }
 
                     if(mIsbn.getText().toString().isEmpty())
                         mIsbn.setText(isbn);
