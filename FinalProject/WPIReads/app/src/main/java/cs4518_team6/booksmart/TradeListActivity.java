@@ -26,7 +26,7 @@ public class TradeListActivity extends AppCompatActivity {
         SearchBookAdapter adapter = new SearchBookAdapter(TradeListActivity.this, bookArray,
                 getIntent().getStringExtra("TYPE_FLAG"), getIntent().getStringExtra("TRADE_BOOK"));
         tradeList.setAdapter(adapter);
-        bookArray.add("Example 1");
+        bookArray.add("Social Science Research");
 
         adapter.notifyDataSetChanged();
     }
