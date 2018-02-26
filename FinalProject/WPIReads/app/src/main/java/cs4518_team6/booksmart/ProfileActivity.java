@@ -204,6 +204,7 @@ public class ProfileActivity extends AppCompatActivity
 
     private void getIsbnFromUser(){
         final EditText textIsbn = new EditText(this);
+        textIsbn.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         new AlertDialog.Builder(this)
                 .setTitle("New Wanted Book")
