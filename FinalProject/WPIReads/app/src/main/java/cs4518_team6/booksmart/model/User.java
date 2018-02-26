@@ -2,6 +2,7 @@ package cs4518_team6.booksmart.model;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,28 +31,34 @@ public class User extends Model {
     private String username;
     private String firstName;
     private String lastName;
-    private List<Book> owned;
-    private List<Book> wanted;
-
-    public User(String username, String firstName, String lastName, List<Book> owned, List<Book> wanted) {
-        this.username = username;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.owned = owned;
-        this.wanted = wanted;
-    }
+    private Book[] owned;
+    private Book[] wanted;
 
     /**
      * Add a {@link Book} to the user's wanted list.
      * @param isbn The isbn of the book to add.
      */
-    public void addWanted(String isbn) {
+    public boolean addWanted(String isbn) {
         String url = Constants.API_URL + ENDPOINT + "wanted";
         Map<String, String> data = new HashMap<>();
         data.put("isbn", isbn);
         data.put("username", username);
 
-        HttpRequest.post(url).form(data);
+        return HttpRequest.post(url).form(data).code() == HttpURLConnection.HTTP_OK;
+    }
+
+    /**
+     * Add a {@link Book} to the user's wanted list.
+     * @param isbn The isbn of the book to add.
+     * @return <code>true</code> if successful, otherwise <code>false</code>
+     */
+    public boolean addOwned(String isbn) {
+        String url = Constants.API_URL + ENDPOINT + "owned";
+        Map<String, String> data = new HashMap<>();
+        data.put("isbn", isbn);
+        data.put("username", username);
+
+        return HttpRequest.post(url).form(data).code() == HttpURLConnection.HTTP_OK;
     }
 
     /**
@@ -112,6 +119,30 @@ public class User extends Model {
         }
 
         return null;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    public Book[] getOwned() {
+        return owned;
+    }
+
+    public Book[] getWanted() {
+        return wanted;
     }
 
     @Override

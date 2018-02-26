@@ -37,15 +37,6 @@ public class Listing extends Model {
     private Double price;
     private String[] listingTypes;
 
-    public Listing(Integer listingId, String username, String isbn, String condition, Double price, String[] listingTypes) {
-        this.listingId = listingId;
-        this.username = username;
-        this.isbn = isbn;
-        this.condition = condition;
-        this.price = price;
-        this.listingTypes = listingTypes;
-    }
-
     public static boolean add(String username, String isbn, String condition, Double price, final List<ListingType> listingTypes) {
         String url = Constants.API_URL + ENDPOINT + "add";
         Map<String, String> data = new HashMap<>();

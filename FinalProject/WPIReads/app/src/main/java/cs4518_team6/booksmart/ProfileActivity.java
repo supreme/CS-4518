@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import cs4518_team6.booksmart.model.Book;
+import cs4518_team6.booksmart.model.User;
 
 public class ProfileActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -73,9 +74,9 @@ public class ProfileActivity extends AppCompatActivity
 
         View header = navigationView.getHeaderView(0);
         TextView navName = header.findViewById(R.id.nav_name);
-        navName.setText("New Name"); //TODO: Get user's name from db
+        navName.setText(CurrentUser.getInstance().getUser().getFullName());
         TextView navEmail = header.findViewById(R.id.nav_email_address);
-        navEmail.setText("New Email"); //TODO: Get user's email from db
+        navEmail.setText(CurrentUser.getInstance().getUser().getUsername());
 
         mAddWantedBook = findViewById(R.id.add_wanted_book);
         mAddWantedBook.setOnClickListener(new View.OnClickListener() {
@@ -88,8 +89,10 @@ public class ProfileActivity extends AppCompatActivity
         mWantedBookList = findViewById(R.id.wanted_book_list);
         if (wantedArray == null) {
             wantedArray = new ArrayList<String>();
-            wantedArray.add("Example 1");
-            wantedArray.add("Example 2");
+            Book[] wanted = CurrentUser.getInstance().getUser().getWanted();
+            for (Book book : wanted) {
+                wantedArray.add(book.getTitle());
+            }
         }
         wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, wantedArray);
         mWantedBookList.setAdapter(wantedAdapter);
@@ -108,8 +111,10 @@ public class ProfileActivity extends AppCompatActivity
         mOwnedBookList = findViewById(R.id.owned_book_list);
         if (ownedArray == null) {
             ownedArray = new ArrayList<String>();
-            ownedArray.add("Example 3");
-            ownedArray.add("Example 4");
+            Book[] owned = CurrentUser.getInstance().getUser().getOwned();
+            for (Book book : owned) {
+                ownedArray.add(book.getTitle());
+            }
         }
 
         ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, ownedArray);
@@ -217,12 +222,11 @@ public class ProfileActivity extends AppCompatActivity
 
                         if (book != null) {
                             addWantedBook(book.getTitle());
+                            CurrentUser.getInstance().getUser().addWanted(isbn);
                         } else {
                             Toast.makeText(getApplicationContext(),
                                     "Error finding ISBN: " + isbn, Toast.LENGTH_SHORT).show();
                         }
-                        //TODO: Add book to user accounts wanted list
-                        // Currently have no way to get user
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
