@@ -26,6 +26,11 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import cs4518_team6.booksmart.model.Listing;
+
 public class AddBookActivity extends AppCompatActivity {
 
 
@@ -80,6 +85,15 @@ public class AddBookActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //TODO: Add new book to backend
+                List<Listing.ListingType> listingTypes = new ArrayList<>();
+                listingTypes.add(Listing.ListingType.FOR_SALE);
+                listingTypes.add(Listing.ListingType.FOR_LOAN);
+                Listing.add("sandrews@wpi.edu", "1451648537", "Excellent", 4.20, listingTypes);
+                List<Listing> listings = Listing.getAll();
+                Log.d("steve", "Listings: " + listings.size());
+                for (Listing listing : listings) {
+                    Log.d("steve", listing.toString());
+                }
                 Intent intent = new Intent(AddBookActivity.this, ProfileActivity.class);
                 startActivity(intent);
             }
