@@ -68,6 +68,7 @@ public class SearchActivity extends AppCompatActivity {
                 buyArray.add("Fundamentals of Calculus");
                 sellArray.add("Fundamentals of Calculus");
                 sellArray.add("Fundamentals of Calculus");
+                populateLists();
             }
         });
 
