@@ -21,7 +21,11 @@ user_view = Blueprint('user', __name__)
 def get_user(username):
     """Get a user's profile."""
 
-    return jsonify(User.query.filter_by(username=username).first().to_json()), 200
+    user = User.query.filter_by(username=username).first()
+    if user:
+        return jsonify(user.to_json()), 200
+
+    return jsonify({'status': False, 'message': 'User ({}) doesn\t exist!'.format(username)}), 404
 
 @user_view.route('/owned', methods=['POST'])
 def add_owned_book():
@@ -66,9 +70,9 @@ def login():
 
     user = User.query.filter_by(username=username).first()
     if not user or user.password != password:
-        return jsonify({'status': 'error', 'message': 'Incorrect username or password!'}), 401
+        return jsonify({'status': False, 'message': 'Incorrect username or password!'}), 401
 
-    return jsonify({'status': 'ok', 'message': 'Successfully logged in!'}), 200
+    return jsonify({'status': True, 'message': 'Successfully logged in!'}), 200
 
 @user_view.route('/register', methods=['POST'])
 def register():
@@ -85,10 +89,10 @@ def register():
     last_name = request.form['lastName']
 
     if User.query.filter_by(username=username).first():
-        return jsonify({'status': 'error', 'message': 'Username already taken!'}), 409
+        return jsonify({'status': False, 'message': 'Username already taken!'}), 409
 
     user = User(username=username, password=password, first_name=first_name, last_name=last_name)
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({'status': 'ok', 'message': 'Successfully registered {}'.format(username)}), 201
+    return jsonify({'status': True, 'message': 'Successfully registered {}'.format(username)}), 201

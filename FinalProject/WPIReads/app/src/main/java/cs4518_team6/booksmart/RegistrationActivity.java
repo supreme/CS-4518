@@ -7,9 +7,18 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import cs4518_team6.booksmart.model.Response;
+import cs4518_team6.booksmart.model.User;
+
 public class RegistrationActivity extends AppCompatActivity {
+
+    private TextView firstNameField;
+    private TextView lastNameField;
+    private TextView emailField;
+    private TextView passwordField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,8 +27,13 @@ public class RegistrationActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Button buton = findViewById(R.id.register_button);
-        buton.setOnClickListener(new View.OnClickListener() {
+        firstNameField = findViewById(R.id.firstName);
+        lastNameField = findViewById(R.id.lastName);
+        emailField = findViewById(R.id.email);
+        passwordField = findViewById(R.id.password);
+
+        Button button = findViewById(R.id.register_button);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptRegistration();
@@ -28,16 +42,19 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void attemptRegistration(){
-        boolean success = false;
-        //TODO: Registration logic - check backend if user already exists, valid username, etc
-        if (success){
+        Response response = User.register(
+                emailField.getText().toString(),
+                passwordField.getText().toString(),
+                firstNameField.getText().toString(),
+                lastNameField.getText().toString());
+
+        // TODO: Check both passwords and see if they match
+        if (response.getStatus()){
             Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
-            Toast.makeText(this, "Registration successful!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, response.getMessage(), Toast.LENGTH_LONG).show();
             startActivity(intent);
-        }
-        else {
-            //TODO: Add why registration failed
-            Toast.makeText(this, "Registration failed!", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, response.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

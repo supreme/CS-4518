@@ -3,7 +3,9 @@ package cs4518_team6.booksmart;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +27,8 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import cs4518_team6.booksmart.model.Book;
+
 public class ProfileActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -40,6 +44,10 @@ public class ProfileActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Super fucking annoying
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         //TODO: Send user back to login screen if they're not logged in.
         // This is for if the user logs out then navigates back to this screen using the back button
@@ -204,9 +212,11 @@ public class ProfileActivity extends AppCompatActivity
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String isbn = textIsbn.getText().toString();
-                        //TODO: Use google books API to get title from isbn
-                        String title = isbn;
-                        addWantedBook(title);
+                        Book book = Book.get(isbn);
+                        addWantedBook(book.getTitle());
+
+                        //TODO: Add book to user accounts wanted list
+                        // Currently have no way to get user
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

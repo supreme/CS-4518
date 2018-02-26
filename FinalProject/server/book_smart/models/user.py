@@ -22,8 +22,8 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Text, unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
-    first_name = db.Column(db.Text, unique=True, nullable=False)
-    last_name = db.Column(db.Text, unique=True, nullable=False)
+    first_name = db.Column(db.Text, nullable=False)
+    last_name = db.Column(db.Text, nullable=False)
     owned_list = db.relationship('Book', secondary=owned_identifier)
     wanted_list = db.relationship('Book', secondary=wanted_identifier)
 
@@ -31,8 +31,8 @@ class User(db.Model):
         user = {}
         user['user_id'] = self.user_id
         user['username'] = self.username
-        user['first_name'] = self.first_name
-        user['last_name'] = self.last_name
+        user['firstName'] = self.first_name
+        user['lastName'] = self.last_name
         user['owned'] = [book.to_json() for book in self.owned_list]
         user['wanted'] = [book.to_json() for book in self.wanted_list]
 
