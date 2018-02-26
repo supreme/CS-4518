@@ -34,20 +34,26 @@ public class User extends Model {
     private Book[] owned;
     private Book[] wanted;
 
-//    public User(String username, String firstName, String lastName, List<Book> owned, List<Book> wanted) {
-//        this.username = username;
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//        this.owned = owned;
-//        this.wanted = wanted;
-//    }
-
     /**
      * Add a {@link Book} to the user's wanted list.
      * @param isbn The isbn of the book to add.
      */
     public boolean addWanted(String isbn) {
         String url = Constants.API_URL + ENDPOINT + "wanted";
+        Map<String, String> data = new HashMap<>();
+        data.put("isbn", isbn);
+        data.put("username", username);
+
+        return HttpRequest.post(url).form(data).code() == HttpURLConnection.HTTP_OK;
+    }
+
+    /**
+     * Add a {@link Book} to the user's wanted list.
+     * @param isbn The isbn of the book to add.
+     * @return <code>true</code> if successful, otherwise <code>false</code>
+     */
+    public boolean addOwned(String isbn) {
+        String url = Constants.API_URL + ENDPOINT + "owned";
         Map<String, String> data = new HashMap<>();
         data.put("isbn", isbn);
         data.put("username", username);
