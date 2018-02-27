@@ -35,9 +35,7 @@ def add():
     price = request.form.get('price', None)
     listing_types = request.form['listingTypes']
 
-    import json
-    print(json.dumps(request.form, indent=4))
-    user = User.query.filter_by(username=username).first()
+    User.query.filter_by(username=username).first()
     # if isbn not in [book.isbn for book in user.owned_list]:
     #     return jsonify({'status': 'error', 'message': 'User  doesn\'t own book!'}), 401
 
@@ -54,7 +52,7 @@ def add():
 
     return 'success', 200
 
-@listing_view.route('/delete/<listing_id>', methods=['GET'])
+@listing_view.route('/delete/<listing_id>', methods=['DELETE'])
 def delete(listing_id):
     """Delete a listing."""
 

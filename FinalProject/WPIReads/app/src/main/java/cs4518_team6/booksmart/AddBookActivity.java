@@ -26,6 +26,7 @@ import java.util.List;
 
 import cs4518_team6.booksmart.model.Book;
 import cs4518_team6.booksmart.model.Listing;
+import cs4518_team6.booksmart.model.User;
 
 public class AddBookActivity extends AppCompatActivity {
 
@@ -74,26 +75,7 @@ public class AddBookActivity extends AppCompatActivity {
         mSale = findViewById(R.id.check_box_sell);
         mSalePrice = findViewById(R.id.sale_price);
         mTrade = findViewById(R.id.check_box_trade);
-        //TODO: If either of these are checked, add to database so we can populate search
 
-        mAddBook = findViewById(R.id.add_book);
-        mAddBook.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO: Add new book to backend
-                List<Listing.ListingType> listingTypes = new ArrayList<>();
-                listingTypes.add(Listing.ListingType.FOR_SALE);
-                listingTypes.add(Listing.ListingType.FOR_LOAN);
-                Listing.add("sandrews@wpi.edu", "1451648537", "Excellent", 4.20, listingTypes);
-                List<Listing> listings = Listing.getAll();
-                Log.d("steve", "Listings: " + listings.size());
-                for (Listing listing : listings) {
-                    Log.d("steve", listing.toString());
-                }
-                Intent intent = new Intent(AddBookActivity.this, ProfileActivity.class);
-                startActivity(intent);
-            }
-        });
 
         mCancel = findViewById(R.id.cancel);
         mCancel.setOnClickListener(new View.OnClickListener() {
@@ -114,6 +96,7 @@ public class AddBookActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mCondition.setAdapter(adapter);
 
+        mAddBook = findViewById(R.id.add_book);
         mAddBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,11 +106,44 @@ public class AddBookActivity extends AppCompatActivity {
                 else {
                     Book book = Book.get(mIsbn.getText().toString());
                     ProfileActivity.addOwnedBook(book.getTitle(), book.getIsbn());
+
+                    // Add to publicly available listings
+                    if (mSale.isChecked() || mTrade.isChecked()) {
+                        addListing(book);
+                    }
                     Intent intent = new Intent(AddBookActivity.this, ProfileActivity.class);
                     startActivity(intent);
                 }
             }
         });
+    }
+
+    /**
+     * Add this book as a new public listing if the user checks either
+     * the sale or trade checkbox.
+     * @book The book to list.
+     */
+    private void addListing(Book book) {
+        List<Listing.ListingType> listingTypes = new ArrayList<>();
+        User user = CurrentUser.getInstance().getUser();
+        Double price = mSalePrice.getText().toString().equals("")
+                ? null : Double.valueOf(mSalePrice.getText().toString());
+        if (mSale.isChecked()) {
+            listingTypes.add(Listing.ListingType.FOR_SALE);
+            listingTypes.add(Listing.ListingType.FOR_LOAN);
+        }
+
+        if (mTrade.isChecked()) {
+            listingTypes.add(Listing.ListingType.FOR_TRADE);
+        }
+
+
+        Listing.add(user.getUsername(), book.getIsbn(), mCondition.getSelectedItem().toString(), price, listingTypes);
+        List<Listing> listings = Listing.getAll();
+        Log.d("steve", "Listings: " + listings.size());
+        for (Listing listing : listings) {
+            Log.d("steve", listing.toString());
+        }
     }
 
     @Override

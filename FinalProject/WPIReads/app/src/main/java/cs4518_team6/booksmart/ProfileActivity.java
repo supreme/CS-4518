@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cs4518_team6.booksmart.model.Book;
+import cs4518_team6.booksmart.model.Listing;
 
 public class ProfileActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -212,6 +213,14 @@ public class ProfileActivity extends AppCompatActivity
         ownedArray.remove(title);
         ownedMap.remove(title);
         ownedAdapter.notifyDataSetChanged();
+
+        // Check if listing exists for this book
+        String username = CurrentUser.getInstance().getUser().getUsername();
+        for (Listing listing : Listing.getAll()) {
+            if (listing.getUsername().equals(username) && listing.getIsbn().equals(isbn)) {
+                Listing.delete(listing.getListingId());
+            }
+        }
     }
 
     private void getIsbnFromUser(){

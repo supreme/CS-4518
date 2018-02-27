@@ -5,6 +5,7 @@ import android.util.Log;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,7 +44,9 @@ public class Listing extends Model {
         data.put("username", username);
         data.put("isbn", isbn);
         data.put("condition", condition);
-        data.put("price", String.valueOf(price));
+        if (price != null) {
+            data.put("price", String.valueOf(price));
+        }
 
         List<Integer> listingTypeIds = new ArrayList<>();
         for (ListingType l : listingTypes) {
@@ -51,10 +54,17 @@ public class Listing extends Model {
         }
         data.put("listingTypes", listingTypeIds.toString());
 
-        Log.d("steve", data.toString());
-        HttpRequest request = HttpRequest.post(url).form(data);
-        Log.d("steve", request.body());
-        return false;
+        return HttpRequest.post(url).form(data).code() == HttpURLConnection.HTTP_OK;
+    }
+
+    /**
+     * Delete a listing.
+     * @param listingId The id of the listing to delete.
+     */
+    public static boolean delete(int listingId) {
+        String url = Constants.API_URL + ENDPOINT + "delete/" + listingId;
+
+        return HttpRequest.delete(url).code() == HttpURLConnection.HTTP_OK;
     }
 
     public static List<Listing> getAll() {
@@ -64,6 +74,30 @@ public class Listing extends Model {
 
         return Arrays.asList(new Gson().fromJson(response, Listing[].class));
 
+    }
+
+    public Integer getListingId() {
+        return listingId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public String[] getListingTypes() {
+        return listingTypes;
     }
 
     @Override
