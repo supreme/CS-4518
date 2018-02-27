@@ -9,7 +9,7 @@ Created by Stephen Andrews, Februrary 17, 2018.
 from flask import Blueprint, request, jsonify, url_for
 import requests
 
-from book_smart.models import User
+from book_smart.models import User, Book
 from book_smart.extensions import db
 from book_smart.views.book import get_book
 
@@ -44,6 +44,24 @@ def add_owned_book():
 
     return 'success', 200
 
+@user_view.route('/<username>/owned/<isbn>', methods=['DELETE'])
+def remove_owned_book(username, isbn):
+    """Delete a book from the user's owned list."""
+
+    user = User.query.filter_by(username=username).first()
+    if user:
+        to_remove = None
+        for book in user.owned_list:
+            if book.isbn == isbn:
+                to_remove = book
+                break
+
+        user.owned_list.remove(to_remove)
+        db.session.add(user)
+        db.session.commit()
+
+    return 'success', 200
+
 @user_view.route('/wanted', methods=['POST'])
 def add_wanted_book():
     """Add a book to a user's 'wanted' list."""
@@ -58,6 +76,24 @@ def add_wanted_book():
     user.wanted_list.append(book)
     db.session.add(user)
     db.session.commit()
+
+    return 'success', 200
+
+@user_view.route('/<username>/wanted/<isbn>', methods=['DELETE'])
+def remove_wanted_book(username, isbn):
+    """Delete a book from the user's wanted list."""
+
+    user = User.query.filter_by(username=username).first()
+    if user:
+        to_remove = None
+        for book in user.wanted_list:
+            if book.isbn == isbn:
+                to_remove = book
+                break
+
+        user.wanted_list.remove(to_remove)
+        db.session.add(user)
+        db.session.commit()
 
     return 'success', 200
 
