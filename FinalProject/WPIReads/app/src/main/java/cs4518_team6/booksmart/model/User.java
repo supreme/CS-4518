@@ -1,21 +1,15 @@
 package cs4518_team6.booksmart.model;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.StrictMode;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.Gson;
 
 import java.net.HttpURLConnection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import cs4518_team6.booksmart.Constants;
-import cs4518_team6.booksmart.LoginActivity;
 
 /**
  * Represents a user interacting with the app.
@@ -48,6 +42,17 @@ public class User extends Model {
     }
 
     /**
+     * Remove a {@link Book} from the user's wanted list.
+     * @param isbn The isbn of the book to remove.
+     * @return <code>true</code> if successful, otherwise <code>false</code>
+     */
+    public boolean removeWanted(String isbn) {
+        String url = Constants.API_URL + ENDPOINT + username + "/wanted/" + isbn;
+
+        return HttpRequest.delete(url).code() == HttpURLConnection.HTTP_OK;
+    }
+
+    /**
      * Add a {@link Book} to the user's wanted list.
      * @param isbn The isbn of the book to add.
      * @return <code>true</code> if successful, otherwise <code>false</code>
@@ -59,6 +64,17 @@ public class User extends Model {
         data.put("username", username);
 
         return HttpRequest.post(url).form(data).code() == HttpURLConnection.HTTP_OK;
+    }
+
+    /**
+     * Remove a {@link Book} from the user's owned list.
+     * @param isbn The isbn of the book to remove.
+     * @return <code>true</code> if successful, otherwise <code>false</code>
+     */
+    public boolean removeOwned(String isbn) {
+        String url = Constants.API_URL + ENDPOINT + username + "/owned/" + isbn;
+
+        return HttpRequest.delete(url).code() == HttpURLConnection.HTTP_OK;
     }
 
     /**

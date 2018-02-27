@@ -2,17 +2,12 @@ package cs4518_team6.booksmart;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.Image;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -29,6 +24,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import java.util.ArrayList;
 import java.util.List;
 
+import cs4518_team6.booksmart.model.Book;
 import cs4518_team6.booksmart.model.Listing;
 
 public class AddBookActivity extends AppCompatActivity {
@@ -121,15 +117,12 @@ public class AddBookActivity extends AppCompatActivity {
         mAddBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ProfileActivity.ownedArray.contains(mTitle.getText().toString())){
+                if (ProfileActivity.ownedMap.keySet().contains(mTitle.getText().toString())){
                     Toast.makeText(AddBookActivity.this, "Book is already in your owned list", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    //TODO: Add new book to backend
-                    CurrentUser.getInstance().getUser().addOwned(mIsbn.getText().toString());
-
-                    // Update UI and return to previous screen
-                    ProfileActivity.ownedArray.add(mTitle.getText().toString());
+                    Book book = Book.get(mIsbn.getText().toString());
+                    ProfileActivity.addOwnedBook(book.getTitle(), book.getIsbn());
                     Intent intent = new Intent(AddBookActivity.this, ProfileActivity.class);
                     startActivity(intent);
                 }

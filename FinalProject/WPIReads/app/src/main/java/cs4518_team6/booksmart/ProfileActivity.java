@@ -4,17 +4,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v7.app.AlertDialog;
-import android.text.InputType;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,24 +22,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import cs4518_team6.booksmart.model.Book;
-import cs4518_team6.booksmart.model.User;
 
 public class ProfileActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ImageButton mAddWantedBook;
     private ListView mWantedBookList;
-    private static ArrayList<String> wantedArray;
+    private static Map<String, String> wantedMap;
     private static ProfileWantedBookAdapter wantedAdapter;
     private ImageButton mAddOwnedBook;
     private ListView mOwnedBookList;
-    public static ArrayList<String> ownedArray;
+    public static Map<String, String> ownedMap;
     private static ArrayAdapter<String> ownedAdapter;
 
     @Override
@@ -87,17 +85,15 @@ public class ProfileActivity extends AppCompatActivity
         });
 
         mWantedBookList = findViewById(R.id.wanted_book_list);
-        if (wantedArray == null) {
-            wantedArray = new ArrayList<String>();
+        if (wantedMap == null) {
+            wantedMap = new HashMap<>();
             Book[] wanted = CurrentUser.getInstance().getUser().getWanted();
             for (Book book : wanted) {
-                wantedArray.add(book.getTitle());
+                wantedMap.put(book.getTitle(), book.getIsbn());
             }
         }
-        wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, wantedArray);
+        wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, new ArrayList<>(wantedMap.keySet()));
         mWantedBookList.setAdapter(wantedAdapter);
-
-
 
         mAddOwnedBook = findViewById(R.id.add_owned_book);
         mAddOwnedBook.setOnClickListener(new View.OnClickListener() {
@@ -109,15 +105,15 @@ public class ProfileActivity extends AppCompatActivity
         });
 
         mOwnedBookList = findViewById(R.id.owned_book_list);
-        if (ownedArray == null) {
-            ownedArray = new ArrayList<String>();
+        if (ownedMap == null) {
+            ownedMap = new HashMap<>();
             Book[] owned = CurrentUser.getInstance().getUser().getOwned();
             for (Book book : owned) {
-                ownedArray.add(book.getTitle());
+                ownedMap.put(book.getTitle(), book.getIsbn());
             }
         }
 
-        ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, ownedArray);
+        ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, new ArrayList<>(ownedMap.keySet()));
         mOwnedBookList.setAdapter(ownedAdapter);
 
         populateLists();
@@ -174,36 +170,38 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     public void populateLists(){
-        //TODO: Add book titles from database to wantedArray and ownedArray
+        //TODO: Add book titles from database to wantedMap and ownedMap
         wantedAdapter.notifyDataSetChanged();
         ownedAdapter.notifyDataSetChanged();
     }
 
-    public void addWantedBook(String title){
-        if (wantedArray.contains(title)){
+    public void addWantedBook(String title, String isbn){
+        if (wantedMap.keySet().contains(title)){
             Toast.makeText(getApplicationContext(), "Book is already in your wanted list", Toast.LENGTH_SHORT).show();
         }
         else {
-            wantedArray.add(title);
+            wantedMap.put(title, isbn);
             wantedAdapter.notifyDataSetChanged();
         }
     }
 
     public static void removeWantedBook(String title){
-        //TODO: Remove from backend database
-        wantedArray.remove(title);
+        String isbn = wantedMap.get(title);
+        CurrentUser.getInstance().getUser().removeWanted(isbn);
+        wantedMap.remove(title);
         wantedAdapter.notifyDataSetChanged();
     }
 
-    public static void addOwnedBook(String title){
-        //TODO: Add to backend database
-        ownedArray.add(title);
+    public static void addOwnedBook(String title, String isbn) {
+        CurrentUser.getInstance().getUser().addOwned(isbn);
+        ownedMap.put(title, isbn);
         ownedAdapter.notifyDataSetChanged();
     }
 
     public static void removeOwnedBook(String title){
-        //TODO: Remove from backend database
-        ownedArray.remove(title);
+        String isbn = ownedMap.get(title);
+        CurrentUser.getInstance().getUser().removeOwned(isbn);
+        ownedMap.remove(title);
         ownedAdapter.notifyDataSetChanged();
     }
 
@@ -221,7 +219,7 @@ public class ProfileActivity extends AppCompatActivity
                         Book book = Book.get(isbn);
 
                         if (book != null) {
-                            addWantedBook(book.getTitle());
+                            addWantedBook(book.getTitle(), book.getIsbn());
                             CurrentUser.getInstance().getUser().addWanted(isbn);
                         } else {
                             Toast.makeText(getApplicationContext(),
