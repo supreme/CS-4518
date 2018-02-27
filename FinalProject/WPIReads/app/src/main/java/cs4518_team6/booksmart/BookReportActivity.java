@@ -1,10 +1,13 @@
 package cs4518_team6.booksmart;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
@@ -13,6 +16,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import cs4518_team6.booksmart.model.Book;
 
 public class BookReportActivity extends AppCompatActivity {
 
@@ -46,11 +56,14 @@ public class BookReportActivity extends AppCompatActivity {
         mTitle = findViewById(R.id.title_value);
         mCondition = findViewById(R.id.condition_value);
 
-        //TODO: Pull these values from database or extent (see activity_book_report.xml)
-        /*mIsbn.setText();
-        mAuthors.setText();
-        mTitle.setText();
-        mCondition.setText();*/
+        String isbn = getIntent().getStringExtra("BOOK_ID");
+        String condition = getIntent().getStringExtra("CONDITION");
+        Book book = Book.get(isbn);
+        mIsbn.setText(isbn);
+        mAuthors.setText(TextUtils.join(", ", book.getAuthors()));
+        mTitle.setText(book.getTitle());
+        mCondition.setText(condition);
+        mGallery.setImageBitmap(getBitmapFromURL(book.getThumbnail()));
     }
 
     @Override
@@ -61,5 +74,20 @@ public class BookReportActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static Bitmap getBitmapFromURL(String src) {
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            // Log exception
+            return null;
+        }
     }
 }

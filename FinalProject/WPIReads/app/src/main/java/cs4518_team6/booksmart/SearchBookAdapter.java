@@ -54,7 +54,7 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.search_book, parent, false);
             final TextView title = view.findViewById(R.id.title);
-            Listing listing = listings.get(position);
+            final Listing listing = listings.get(position);
             title.setText(values.get(position));
 
             ImageView sale = view.findViewById(R.id.for_sale);
@@ -73,8 +73,8 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
                     public void onClick(View view) {
                         Intent intent = new Intent(getContext(), BookReportActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        //TODO: intent.putExtra("BOOK_ID"", [pull book ID from db])
-                        // Either some book ID or putExtra title, isbn, authors, condition, and images
+                        intent.putExtra("BOOK_ID", listing.getIsbn());
+                        intent.putExtra("CONDITION", listing.getCondition());
                         context.startActivity(intent);
                     }
                 });
