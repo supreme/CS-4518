@@ -34,10 +34,12 @@ public class ProfileActivity extends AppCompatActivity
     private ImageButton mAddWantedBook;
     private ListView mWantedBookList;
     private static Map<String, String> wantedMap;
+    private static ArrayList<String> wantedArray;
     private static ProfileWantedBookAdapter wantedAdapter;
     private ImageButton mAddOwnedBook;
     private ListView mOwnedBookList;
     public static Map<String, String> ownedMap;
+    private static ArrayList<String> ownedArray;
     private static ArrayAdapter<String> ownedAdapter;
 
     @Override
@@ -92,7 +94,9 @@ public class ProfileActivity extends AppCompatActivity
                 wantedMap.put(book.getTitle(), book.getIsbn());
             }
         }
-        wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, new ArrayList<>(wantedMap.keySet()));
+
+        wantedArray = new ArrayList<>(wantedMap.keySet());
+        wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, wantedArray);
         mWantedBookList.setAdapter(wantedAdapter);
 
         mAddOwnedBook = findViewById(R.id.add_owned_book);
@@ -113,7 +117,8 @@ public class ProfileActivity extends AppCompatActivity
             }
         }
 
-        ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, new ArrayList<>(ownedMap.keySet()));
+        ownedArray = new ArrayList<>(ownedMap.keySet());
+        ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, ownedArray);
         mOwnedBookList.setAdapter(ownedAdapter);
 
         populateLists();
@@ -180,6 +185,7 @@ public class ProfileActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), "Book is already in your wanted list", Toast.LENGTH_SHORT).show();
         }
         else {
+            wantedArray.add(title);
             wantedMap.put(title, isbn);
             wantedAdapter.notifyDataSetChanged();
         }
@@ -188,12 +194,14 @@ public class ProfileActivity extends AppCompatActivity
     public static void removeWantedBook(String title){
         String isbn = wantedMap.get(title);
         CurrentUser.getInstance().getUser().removeWanted(isbn);
+        wantedArray.remove(title);
         wantedMap.remove(title);
         wantedAdapter.notifyDataSetChanged();
     }
 
     public static void addOwnedBook(String title, String isbn) {
         CurrentUser.getInstance().getUser().addOwned(isbn);
+        ownedArray.add(title);
         ownedMap.put(title, isbn);
         ownedAdapter.notifyDataSetChanged();
     }
@@ -201,6 +209,7 @@ public class ProfileActivity extends AppCompatActivity
     public static void removeOwnedBook(String title){
         String isbn = ownedMap.get(title);
         CurrentUser.getInstance().getUser().removeOwned(isbn);
+        ownedArray.remove(title);
         ownedMap.remove(title);
         ownedAdapter.notifyDataSetChanged();
     }
