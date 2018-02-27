@@ -96,8 +96,20 @@ public class Listing extends Model {
         return price;
     }
 
-    public String[] getListingTypes() {
-        return listingTypes;
+    public List<String> getListingTypes() {
+        return Arrays.asList(listingTypes);
+    }
+
+    public boolean forSale() {
+        boolean sale = false;
+        for (String str : listingTypes) {
+            if (str.equalsIgnoreCase("SALE")) {
+                sale = true;
+                break;
+            }
+        }
+
+        return sale;
     }
 
     @Override

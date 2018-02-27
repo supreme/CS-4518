@@ -1,19 +1,23 @@
 package cs4518_team6.booksmart;
 
+import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import cs4518_team6.booksmart.model.Book;
+import cs4518_team6.booksmart.model.Listing;
 
 public class SearchActivity extends AppCompatActivity {
+
+    // All of the book listings
+    private List<Listing> listings;
 
     private EditText mSearchField;
     private ListView mBuyList;
@@ -45,16 +49,15 @@ public class SearchActivity extends AppCompatActivity {
         tabHost.addTab(buy);
         tabHost.addTab(sell);
 
+        listings = Listing.getAll();
         mBuyList = findViewById(R.id.buy_list);
         buyArray = new ArrayList<String>();
-        buyAdapter = new SearchBookAdapter(SearchActivity.this, buyArray, "BUY");
+        buyAdapter = new SearchBookAdapter(SearchActivity.this, buyArray, "BUY", listings);
         mBuyList.setAdapter(buyAdapter);
-        buyArray.add("Example 1");
-        buyArray.add("Example 2");
 
         mSellList = findViewById(R.id.sell_list);
         sellArray = new ArrayList<String>();
-        sellAdapter = new SearchBookAdapter(SearchActivity.this, sellArray, "SELL");
+        sellAdapter = new SearchBookAdapter(SearchActivity.this, sellArray, "SELL", listings);
         mSellList.setAdapter(sellAdapter);
         sellArray.add("Example 3");
         sellArray.add("Example 4");
@@ -63,7 +66,11 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     public void populateLists(){
-        //TODO: Add book titles from database to buyArray and sellArray
+        for (Listing listing : listings) {
+            Book book = Book.get(listing.getIsbn());
+            buyArray.add(book.getTitle());
+        }
+
         buyAdapter.notifyDataSetChanged();
         sellAdapter.notifyDataSetChanged();
     }

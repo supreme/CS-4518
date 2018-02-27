@@ -3,6 +3,7 @@ package cs4518_team6.booksmart;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,19 +13,25 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import cs4518_team6.booksmart.model.Listing;
 
 
 public class SearchBookAdapter extends ArrayAdapter<String> {
         private final Context context;
         private ArrayList<String> values;
+        private List<Listing> listings;
         private boolean buy = false;
         private boolean trade;
         private String tradeBook;
 
-        public SearchBookAdapter(Context context, ArrayList<String> values, String typeFlag) {
+        public SearchBookAdapter(Context context, ArrayList<String> values, String typeFlag, List<Listing> listings) {
             super(context, -1, values);
             this.context = context;
             this.values = values;
+            this.listings = listings;
             if (typeFlag.equals("BUY"))
                 this.buy = true;
             this.trade = false;
@@ -32,13 +39,13 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
 
         // This constructor is for trading
         public SearchBookAdapter(Context context, ArrayList<String> values, String typeFlag, String tradeBook) {
-        super(context, -1, values);
-        this.context = context;
-        this.values = values;
-        if (typeFlag.equals("BUY"))
-            this.buy = true;
-        this.trade = true;
-        this.tradeBook = tradeBook;
+            super(context, -1, values);
+            this.context = context;
+            this.values = values;
+            if (typeFlag.equals("BUY"))
+                this.buy = true;
+            this.trade = true;
+            this.tradeBook = tradeBook;
         }
 
         @Override
@@ -47,6 +54,7 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.search_book, parent, false);
             final TextView title = view.findViewById(R.id.title);
+            Listing listing = listings.get(position);
             title.setText(values.get(position));
 
             ImageView sale = view.findViewById(R.id.for_sale);
@@ -54,8 +62,10 @@ public class SearchBookAdapter extends ArrayAdapter<String> {
             // Only display price if user wants to buy, not sell
             if (buy) {
                 // TODO: Check if book is set to sell
-                // if (user is selling book)
-                // salePrice.setText(price from database);
+                if (listing.getPrice() != null && listing.forSale()) {
+                    int price = listing.getPrice().intValue();
+                    salePrice.setText(String.valueOf(price));
+                }
 
                 // Can only display book report for books that exist
                 title.setOnClickListener(new View.OnClickListener() {

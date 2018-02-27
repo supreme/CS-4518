@@ -88,14 +88,7 @@ public class ProfileActivity extends AppCompatActivity
         });
 
         mWantedBookList = findViewById(R.id.wanted_book_list);
-        if (wantedMap == null) {
-            wantedMap = new HashMap<>();
-            Book[] wanted = CurrentUser.getInstance().getUser().getWanted();
-            for (Book book : wanted) {
-                wantedMap.put(book.getTitle(), book.getIsbn());
-            }
-        }
-
+        wantedMap = new HashMap<>();
         wantedArray = new ArrayList<>(wantedMap.keySet());
         wantedAdapter = new ProfileWantedBookAdapter(ProfileActivity.this, wantedArray);
         mWantedBookList.setAdapter(wantedAdapter);
@@ -110,14 +103,8 @@ public class ProfileActivity extends AppCompatActivity
         });
 
         mOwnedBookList = findViewById(R.id.owned_book_list);
-        if (ownedMap == null) {
-            ownedMap = new HashMap<>();
-            Book[] owned = CurrentUser.getInstance().getUser().getOwned();
-            for (Book book : owned) {
-                ownedMap.put(book.getTitle(), book.getIsbn());
-            }
-        }
 
+        ownedMap = new HashMap<>();
         ownedArray = new ArrayList<>(ownedMap.keySet());
         ownedAdapter = new ProfileOwnedBookAdapter(ProfileActivity.this, ownedArray);
         mOwnedBookList.setAdapter(ownedAdapter);
@@ -176,7 +163,20 @@ public class ProfileActivity extends AppCompatActivity
     }
 
     public void populateLists(){
-        //TODO: Add book titles from database to wantedMap and ownedMap
+        // Populate wanted list
+        Book[] wanted = CurrentUser.getInstance().getUser().getWanted();
+        for (Book book : wanted) {
+            wantedMap.put(book.getTitle(), book.getIsbn());
+            wantedArray.add(book.getTitle());
+        }
+
+        // Populate owned list
+        Book[] owned = CurrentUser.getInstance().getUser().getOwned();
+        for (Book book : owned) {
+            ownedMap.put(book.getTitle(), book.getIsbn());
+            ownedArray.add(book.getTitle());
+        }
+
         wantedAdapter.notifyDataSetChanged();
         ownedAdapter.notifyDataSetChanged();
     }
