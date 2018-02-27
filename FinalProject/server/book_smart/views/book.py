@@ -44,7 +44,12 @@ def get_book(isbn):
 
     book = Book(**book_data)
     for author in author_data:
-        first, last = author.split(' ')
+        data = author.split(' ')
+        if len(data) == 2:
+            first, last = data
+        elif len(data) == 3:
+            first, last = (data[0], data[2])
+
         if Author.query.filter_by(first_name=first, last_name=last).first():
             continue
 
